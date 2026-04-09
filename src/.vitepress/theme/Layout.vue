@@ -64,6 +64,8 @@ const mainContainerRef = ref(null)
 const infoDialogVisible = ref(false)
 const infoDialogTitle = ref('信息')
 const infoDialogMessage = ref('')
+const infoDialogShowCancel = ref(false)
+let infoDialogOnConfirm = null
 const infoDialogConfirmButton = ref(null)
 const MOBILE_MEDIA_QUERY = '(max-width: 767.98px)'
 /** 与 Bootstrap `d-lg-block` / style.css 中桌面侧栏媒体查询一致 */
@@ -770,15 +772,27 @@ function bindLightboxTrigger(img) {
   img.addEventListener('click', () => openLightbox(img.src, img))
 }
 
-function openInfoDialog(message, title = '信息') {
+function openInfoDialog(message, title = '信息', onConfirm = null, showCancel = false) {
   infoDialogTitle.value = title
   infoDialogMessage.value = message
+  infoDialogOnConfirm = onConfirm
+  infoDialogShowCancel.value = !!(showCancel.value ?? showCancel)
   infoDialogVisible.value = true
   syncBodyScrollLock()
 }
 
+function handleInfoDialogConfirm() {
+  const onConfirm = infoDialogOnConfirm
+  if (typeof onConfirm === 'function') {
+    onConfirm()
+  }
+  closeInfoDialog()
+}
+
 function closeInfoDialog() {
   infoDialogVisible.value = false
+  infoDialogOnConfirm = null
+  infoDialogShowCancel.value = false
   syncBodyScrollLock()
 }
 
@@ -878,6 +892,33 @@ function bindCodeBlockCopy(block) {
 
 function processCodeBlocks() {
   document.querySelectorAll(".site-shell div[class*='language-']").forEach(bindCodeBlockCopy)
+}
+
+function bindJoinGroupButtons(root = null) {
+  const container = root ?? docArticleRef.value
+  if (!container) return
+  container.querySelectorAll('.group-join-btn').forEach(btn => {
+    if (btn.dataset.hmConfirmBound === '1') return
+    btn.dataset.hmConfirmBound = '1'
+    btn.addEventListener('click', e => {
+      e.preventDefault()
+      const href = btn.href
+      const target = btn.target || '_blank'
+      openInfoDialog(
+        '即将跳转到 幻梦丨🈲广商丨③群，是否确认？',
+        '提示',
+        () => {
+          window.open(href, target)
+        },
+        true
+      )
+    })
+  })
+}
+
+function processContentActions(root = null) {
+  processCodeBlocks()
+  bindJoinGroupButtons(root)
 }
 
 function scheduleImageRowProcessing(force = false) {
@@ -1035,7 +1076,7 @@ onMounted(() => {
   syncViewportMode()
   resetMobileHeaderState()
   nextTick(() => {
-    processCodeBlocks()
+    processContentActions()
     syncDesktopSidebarLayout()
   })
   document.addEventListener('keydown', handleDocumentKeydown)
@@ -1095,7 +1136,7 @@ watch(
     forceCloseLightbox()
     resetMobileHeaderState()
     nextTick(() => {
-      processCodeBlocks()
+      processContentActions()
       syncDesktopSidebarLayout()
     })
   },
@@ -1123,6 +1164,7 @@ async function onDocPageEnter(el, done) {
     }
     if (el.classList.contains('doc-article')) {
       await processImageRowsAsync({ force: true, root: el })
+      bindJoinGroupButtons(el)
     }
   } catch (e) {
     console.error(e)
@@ -1456,9 +1498,17 @@ watch(infoDialogVisible, async visible => {
               ref="infoDialogConfirmButton"
               type="button"
               class="hm-dialog__confirm"
-              @click="closeInfoDialog"
+              @click="handleInfoDialogConfirm"
             >
               确定
+            </button>
+            <button
+              v-if="infoDialogShowCancel"
+              type="button"
+              class="hm-dialog__cancel"
+              @click="closeInfoDialog"
+            >
+              取消
             </button>
           </div>
         </div>
