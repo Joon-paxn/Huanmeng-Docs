@@ -1,0 +1,30 @@
+# 依赖（体积大，可用 lock 文件重装）
+node_modules/
+
+# 若在 config 里把 outDir / cacheDir / .temp 指到仓库根目录，再靠下面三行兜底
+**/dist/
+**/cache/
+**/.temp/
+**/0.0.0.0/
+**/.vscode/
+
+# 环境变量与密钥（若有）
+.env
+.env.local
+.env.*.local
+
+# 日志
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 操作系统
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# 本机专用 npm 源
+# .npmrc
