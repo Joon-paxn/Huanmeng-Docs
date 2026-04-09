@@ -7,9 +7,9 @@ const { site, frontmatter, page } = useData()
 const navLinks = [
   { href: '/', label: '首页', isActive: relativePath => relativePath === 'index.md' },
   {
-    href: '/hmdoc/',
+    href: '/docs/',
     label: '机器人文档',
-    isActive: relativePath => relativePath === 'hmdoc/index.md' || relativePath.startsWith('hmdoc/')
+    isActive: relativePath => relativePath === 'docs/index.md' || relativePath.startsWith('docs/')
   },
   {
     href: '/markdown-examples.html',
@@ -23,6 +23,12 @@ const navLinks = [
   }
 ]
 
+const desktopSidebarLinks = [
+  { href: '/docs/', label: '🏠 首页', isActive: relativePath => relativePath === 'docs/index.md' },
+  { href: '/docs/frequently_asked_questions.html', label: '❓ 常见问题FAQ', isActive: relativePath => relativePath === 'docs/frequently_asked_questions.md' },
+  { href: '/docs/support.html', label: '🧋 支持幻梦', isActive: relativePath => relativePath === 'docs/support.md' }
+]
+
 const currentYear = new Date().getFullYear()
 /** 文档/首页切换时驱动淡入淡出（与导航切换同一套 key） */
 const docContentTransitionKey = computed(() =>
@@ -33,6 +39,7 @@ const currentPageLabel = computed(() => {
   const activeLink = navLinks.find(link => link.isActive(page.value.relativePath))
   return activeLink?.label || page.value.title || site.value.title
 })
+const shouldShowDesktopSidebar = computed(() => page.value.relativePath.startsWith('docs/'))
 
 const menuOpen = ref(false)
 /** 关闭菜单时延迟到面板收起动画结束再撤掉顶栏 overflow，否则下拉层会被立刻裁掉 */
@@ -52,10 +59,18 @@ const lightboxFlipRef = ref(null)
 const lightboxImgRef = ref(null)
 /** 文档页 `<article class="doc-article">`，避免 `querySelector` 命中过渡中错误的节点 */
 const docArticleRef = ref(null)
+const siteHeaderRef = ref(null)
+const mainContainerRef = ref(null)
 const infoDialogVisible = ref(false)
+const infoDialogTitle = ref('信息')
 const infoDialogMessage = ref('')
 const infoDialogConfirmButton = ref(null)
 const MOBILE_MEDIA_QUERY = '(max-width: 767.98px)'
+/** 与 Bootstrap `d-lg-block` / style.css 中桌面侧栏媒体查询一致 */
+const DESKTOP_SIDEBAR_MEDIA_QUERY = '(min-width: 992px)'
+const DESKTOP_SIDEBAR_DOC_GAP_PX = 30
+const DESKTOP_SIDEBAR_WIDTH_PX = 240
+const DESKTOP_SIDEBAR_HEADER_GAP_PX = 50
 /** 与 style.css 中 .mobile-nav 的 grid-template-rows 时长一致 */
 const MOBILE_NAV_PANEL_MS = 300
 const MOBILE_NAV_CLOSE_FALLBACK_MS = MOBILE_NAV_PANEL_MS + 100
@@ -239,6 +254,34 @@ function isMobileViewport() {
 
 function syncViewportMode() {
   isMobileView.value = window.matchMedia(MOBILE_MEDIA_QUERY).matches
+}
+
+/**
+ * 桌面侧栏定位：
+ * - 水平：以正文容器左边为基准，向左留 `DESKTOP_SIDEBAR_DOC_GAP_PX` 后绘制 `DESKTOP_SIDEBAR_WIDTH_PX`
+ * - 垂直：直接对齐正文容器的视口顶边（cr.top），使侧栏起始高度与正文文档完全一致
+ */
+function syncDesktopSidebarLayout() {
+  if (typeof document === 'undefined') return
+  if (!window.matchMedia(DESKTOP_SIDEBAR_MEDIA_QUERY).matches) {
+    document.documentElement.style.removeProperty('--hm-desktop-sidebar-left')
+    document.documentElement.style.removeProperty('--hm-desktop-sidebar-top')
+    document.documentElement.style.removeProperty('--hm-desktop-sidebar-width')
+    return
+  }
+
+  const containerEl = mainContainerRef.value
+  if (!containerEl) return
+
+  const cr = containerEl.getBoundingClientRect()
+
+  const left = Math.max(16, Math.round(cr.left - (DESKTOP_SIDEBAR_DOC_GAP_PX + DESKTOP_SIDEBAR_WIDTH_PX)))
+  /* 侧栏 top 直接取正文容器视口顶边，确保两者起始高度严格对齐 */
+  const top = Math.max(0, Math.round(cr.top))
+
+  document.documentElement.style.setProperty('--hm-desktop-sidebar-left', `${left}px`)
+  document.documentElement.style.setProperty('--hm-desktop-sidebar-top', `${top}px`)
+  document.documentElement.style.setProperty('--hm-desktop-sidebar-width', `${DESKTOP_SIDEBAR_WIDTH_PX}px`)
 }
 
 function clampLightboxScale(scale) {
@@ -587,6 +630,14 @@ function startLightboxCloseAnimation() {
 }
 
 function handleDocumentKeydown(e) {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+    const article = docArticleRef.value
+    const tab = e.target?.closest?.('button.plugin-tabs--tab')
+    if (article && tab && article.contains(tab)) {
+      nextTick(() => scheduleImageRowProcessing(true))
+    }
+  }
+
   if (e.key !== 'Escape') return
 
   if (infoDialogVisible.value) {
@@ -656,6 +707,7 @@ function handleMobileHeaderScroll() {
 function handleWindowResize() {
   syncViewportMode()
   syncLightboxScale()
+  syncDesktopSidebarLayout()
 
   if (!isMobileViewport()) {
     clearMobileNavCloseFallback()
@@ -718,7 +770,8 @@ function bindLightboxTrigger(img) {
   img.addEventListener('click', () => openLightbox(img.src, img))
 }
 
-function openInfoDialog(message) {
+function openInfoDialog(message, title = '信息') {
+  infoDialogTitle.value = title
   infoDialogMessage.value = message
   infoDialogVisible.value = true
   syncBodyScrollLock()
@@ -795,7 +848,7 @@ async function handleCopyButtonClick(block, button) {
     openInfoDialog('复制成功!')
   } catch (error) {
     setCopyButtonState(button, 'error')
-    openInfoDialog('复制失败，请授予剪贴板写入权限!')
+    openInfoDialog('复制失败，请授予剪贴板写入权限!', '提示')
   }
 }
 
@@ -839,6 +892,19 @@ function scheduleImageRowProcessing(force = false) {
     imageRowForceProcess = false
     imageRowProcessFrame = 0
   })
+}
+
+/**
+ * vitepress-plugin-tabs 非当前面板用 v-if 卸载，切换标签会挂载全新 DOM；
+ * 须在激活后重新跑图片行/高度约束逻辑（否则 #*px #…px 等仅首屏标签生效）。
+ * 键盘切换见 handleDocumentKeydown（左右箭头）。
+ */
+function handleVitepressPluginTabClick(ev) {
+  const article = docArticleRef.value
+  if (!article) return
+  const tab = ev.target?.closest?.('button.plugin-tabs--tab')
+  if (!tab || !article.contains(tab)) return
+  nextTick(() => scheduleImageRowProcessing(true))
 }
 
 function nextDoubleRaf() {
@@ -970,8 +1036,10 @@ onMounted(() => {
   resetMobileHeaderState()
   nextTick(() => {
     processCodeBlocks()
+    syncDesktopSidebarLayout()
   })
   document.addEventListener('keydown', handleDocumentKeydown)
+  document.addEventListener('click', handleVitepressPluginTabClick)
   window.addEventListener('resize', handleWindowResize)
   window.addEventListener('scroll', handleMobileHeaderScroll, { passive: true })
 
@@ -991,6 +1059,11 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if (typeof document !== 'undefined') {
+    document.documentElement.style.removeProperty('--hm-desktop-sidebar-left')
+    document.documentElement.style.removeProperty('--hm-desktop-sidebar-top')
+    document.documentElement.style.removeProperty('--hm-desktop-sidebar-width')
+  }
   clearMobileNavCloseFallback()
   if (imageRowProcessFrame) window.cancelAnimationFrame(imageRowProcessFrame)
   copyButtonResetTimers.forEach(timer => clearTimeout(timer))
@@ -1007,6 +1080,7 @@ onBeforeUnmount(() => {
   }
 
   document.removeEventListener('keydown', handleDocumentKeydown)
+  document.removeEventListener('click', handleVitepressPluginTabClick)
   window.removeEventListener('resize', handleWindowResize)
   window.removeEventListener('scroll', handleMobileHeaderScroll)
   if (bodyScrollLocked) {
@@ -1022,6 +1096,7 @@ watch(
     resetMobileHeaderState()
     nextTick(() => {
       processCodeBlocks()
+      syncDesktopSidebarLayout()
     })
   },
   { flush: 'post' }
@@ -1199,6 +1274,7 @@ watch(infoDialogVisible, async visible => {
 <template>
   <div class="site-shell">
     <header
+      ref="siteHeaderRef"
       class="site-header border-bottom bg-white shadow-sm"
       :class="{
         'mobile-header-hidden': mobileHeaderHidden && !menuOpen,
@@ -1292,11 +1368,34 @@ watch(infoDialogVisible, async visible => {
       <div v-if="menuOpen" class="mobile-nav-backdrop d-md-none" @click="closeMobileMenu"></div>
     </Transition>
 
+    <aside
+      v-if="shouldShowDesktopSidebar"
+      class="desktop-doc-sidebar d-none d-lg-block"
+      aria-label="文档快捷入口"
+    >
+      <nav class="desktop-doc-sidebar__panel">
+        <!-- 顶部标题与分割线 -->
+        <span class="desktop-doc-sidebar__heading">页面切换</span>
+        <hr class="desktop-doc-sidebar__divider" />
+        <a
+          v-for="link in desktopSidebarLinks"
+          :key="`desktop-sidebar-${link.href}`"
+          class="desktop-doc-sidebar__link"
+          :class="{ active: isActiveLink(link) }"
+          :href="getNavHref(link)"
+          :aria-current="isActiveLink(link) ? 'page' : undefined"
+        >
+          {{ link.label }}
+        </a>
+      </nav>
+    </aside>
+
     <main
       class="py-4 py-md-5"
       :class="{ 'hmdoc-index-main': !frontmatter.home && page.relativePath === 'hmdoc/index.md' }"
     >
       <div
+        ref="mainContainerRef"
         class="container"
         :class="{ 'hmdoc-index-container': !frontmatter.home && page.relativePath === 'hmdoc/index.md' }"
       >
@@ -1308,15 +1407,18 @@ watch(infoDialogVisible, async visible => {
           @enter="onDocPageEnter"
           @leave="onDocPageLeave"
         >
-          <div v-if="frontmatter.home" :key="docContentTransitionKey">
+          <div v-if="frontmatter.home" key="vp-route-home">
             <Content />
           </div>
           <article
             v-else
             ref="docArticleRef"
-            :key="docContentTransitionKey"
+            :key="page.relativePath"
             class="doc-article bg-white border shadow-sm p-4 p-md-5"
-            :class="{ 'hmdoc-index-article': page.relativePath === 'hmdoc/index.md' }"
+            :class="{
+              'docs-index-article': page.relativePath === 'docs/index.md',
+              'docs-support-article': page.relativePath === 'docs/support.md'
+            }"
           >
             <Content />
           </article>
@@ -1344,7 +1446,7 @@ watch(infoDialogVisible, async visible => {
         >
           <button type="button" class="hm-dialog__close" aria-label="关闭" @click="closeInfoDialog">&times;</button>
           <div class="hm-dialog__header">
-            <h2 id="hm-dialog-title" class="hm-dialog__title">提示</h2>
+            <h2 id="hm-dialog-title" class="hm-dialog__title">{{ infoDialogTitle }}</h2>
           </div>
           <div class="hm-dialog__body">
             <p id="hm-dialog-message" class="hm-dialog__message">{{ infoDialogMessage }}</p>

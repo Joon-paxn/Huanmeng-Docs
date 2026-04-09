@@ -8,12 +8,15 @@ html {
   --hm-code-block-border: rgba(15, 23, 42, 0.18);
   --hm-code-lang-color: rgba(33, 37, 41, 0.42);
   --hm-code-line-highlight: rgba(15, 23, 42, 0.055);
+  --hm-desktop-sidebar-left: 16px;
+  --hm-desktop-sidebar-top: 120px;
+  /* 侧栏高度由入口数量自动撑开，不再顶到底 */
   --hm-dialog-overlay: rgba(0, 0, 0, 0.3);
   --hm-dialog-surface: #ffffff;
   --hm-dialog-border: rgba(255, 255, 255, 0.7);
   --hm-dialog-shadow: 0 24px 60px rgba(15, 23, 42, 0.18), 0 4px 18px rgba(15, 23, 42, 0.08);
   --hm-dialog-title-color: #1f2329;
-  --hm-dialog-text-color: #4b5563;
+  --hm-dialog-text-color: #000000;
   --hm-dialog-button-bg: #007bff;
   --hm-dialog-button-border: #007bff;
   --hm-dialog-button-text: #ffffff;
@@ -48,7 +51,7 @@ a:hover {
   background: linear-gradient(180deg, #f8f9fa 0%, #eef3f8 100%);
 }
 
-.site-shell > main {
+.site-shell>main {
   flex: 1;
 }
 
@@ -284,7 +287,7 @@ a:hover {
 }
 
 .site-header .nav-link.active,
-.site-header .nav-pills .show > .nav-link {
+.site-header .nav-pills .show>.nav-link {
   border-color: #007bff;
 }
 
@@ -296,10 +299,80 @@ a:hover {
   }
 
   .site-header .nav-link.active:hover,
-  .site-header .nav-pills .show > .nav-link:hover {
+  .site-header .nav-pills .show>.nav-link:hover {
     color: #fff;
     background-color: #0069d9;
     border-color: #0062cc;
+  }
+}
+
+@media (min-width: 992px) {
+  .desktop-doc-sidebar {
+    position: fixed;
+    top: var(--hm-desktop-sidebar-top);
+    left: var(--hm-desktop-sidebar-left);
+    width: var(--hm-desktop-sidebar-width);
+    z-index: 80;
+    pointer-events: none;
+  }
+
+  .desktop-doc-sidebar__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: auto;
+    padding: 10px;
+    overflow: visible;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 0;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+    pointer-events: auto;
+  }
+
+  /* 侧栏顶部标题：「页面切换」 */
+  .desktop-doc-sidebar__heading {
+    display: block;
+    padding: 8px 10px 0;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  /* 分割线：占宽、居中、灰色、线宽 */
+  .desktop-doc-sidebar__divider {
+    width: 90%;
+    margin: 2px 0px 10px 10px;
+    border: none;
+    border-top: 0.8px solid #e3e9f1;
+  }
+
+  .desktop-doc-sidebar__link {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0.5rem 0.75rem;
+    color: #495057;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background-color: transparent;
+  }
+
+  .desktop-doc-sidebar__link:hover {
+    color: #212529;
+    background-color: #e9ecef;
+  }
+
+  .desktop-doc-sidebar__link.active {
+    color: #212529;
+    background-color: #e9ecef;
+  }
+
+  .desktop-doc-sidebar__link.active:hover {
+    background-color: #dde2e6;
   }
 }
 
@@ -404,7 +477,7 @@ a:hover {
   overflow: hidden;
 }
 
-.doc-article div[class*='language-'] > pre {
+.doc-article div[class*='language-']>pre {
   margin: 0;
   padding: 1rem;
   color: var(--shiki-light) !important;
@@ -421,7 +494,7 @@ a:hover {
   background-color: var(--hm-code-line-highlight);
 }
 
-div[class*='language-'] > .lang {
+div[class*='language-']>.lang {
   display: none;
   /* To restore language labels, change "none" above to "block" and uncomment:
   position: absolute;
@@ -437,7 +510,7 @@ div[class*='language-'] > .lang {
   */
 }
 
-div[class*='language-'] > .copy {
+div[class*='language-']>.copy {
   position: absolute;
   top: 0.9rem;
   right: 0.75rem;
@@ -458,27 +531,27 @@ div[class*='language-'] > .copy {
   transition: opacity 0.2s ease;
 }
 
-div[class*='language-'] > .copy:hover {
+div[class*='language-']>.copy:hover {
   opacity: 0.75;
 }
 
-div[class*='language-'] > .copy:focus,
-div[class*='language-'] > .copy:focus-visible {
+div[class*='language-']>.copy:focus,
+div[class*='language-']>.copy:focus-visible {
   outline: none;
   opacity: 0.75;
 }
 
-html.dark div[class*='language-'] > .copy {
+html.dark div[class*='language-']>.copy {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23e5e7eb' stroke-width='1.85' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Crect x='9' y='9' width='11' height='11' rx='2'/%3E%3Cpath d='M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1'/%3E%3C/svg%3E");
 }
 
-div[class*='language-'] > .copy[data-copy-state='success'],
-div[class*='language-'] > .copy.copied {
+div[class*='language-']>.copy[data-copy-state='success'],
+div[class*='language-']>.copy.copied {
   opacity: 0.85;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%2314b86a' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='M5 13.2l4.3 4.3L19 7.8'/%3E%3C/svg%3E");
 }
 
-div[class*='language-'] > .copy[data-copy-state='error'] {
+div[class*='language-']>.copy[data-copy-state='error'] {
   opacity: 0.85;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23ef4444' stroke-width='2.2' stroke-linecap='round' viewBox='0 0 24 24'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E");
 }
@@ -503,7 +576,7 @@ div[class*='language-'] > .copy[data-copy-state='error'] {
 }
 
 .custom-block p:first-child,
-.custom-block .custom-block-title + p {
+.custom-block .custom-block-title+p {
   margin-top: 0;
 }
 
@@ -557,7 +630,7 @@ div[class*='language-'] > .copy[data-copy-state='error'] {
   color: #374151;
 }
 
-.custom-block.details > summary {
+.custom-block.details>summary {
   font-weight: 700;
   cursor: pointer;
   user-select: none;
@@ -594,6 +667,16 @@ div[class*='language-'] > .copy[data-copy-state='error'] {
 
 .doc-article .hm-center {
   text-align: center;
+}
+
+/* 支持页：头图与署名居中；仅署名行改字色 */
+.doc-article.docs-support-article h1+p,
+.doc-article.docs-support-article h1+p+p {
+  text-align: center;
+}
+
+.doc-article.docs-support-article h1+p+p {
+  color: #a3a3a3;
 }
 
 .doc-article img {
@@ -670,15 +753,15 @@ html.dark .hm-dialog__close:hover {
 }
 
 .hm-dialog__header {
-  padding: 40px 24px 0;
+  padding: 36px 22px 0;
 }
 
 .hm-dialog__title {
   margin: 0;
-  padding-top: 12px;
+  padding-top: 8px;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #000000;
 }
 
 html.dark .hm-dialog__title {
@@ -686,7 +769,7 @@ html.dark .hm-dialog__title {
 }
 
 .hm-dialog__body {
-  padding: 6px 24px 24px;
+  padding: 4px 22px 20px;
 }
 
 .hm-dialog__message {
@@ -700,7 +783,7 @@ html.dark .hm-dialog__title {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  padding: 0px 24px 16px;
+  padding: 0px 22px 16px;
 }
 
 .hm-dialog__confirm {
@@ -708,7 +791,7 @@ html.dark .hm-dialog__title {
   align-items: center;
   justify-content: center;
   min-width: 80px;
-  height: 36px;
+  height: 32px;
   padding: 0 1.25rem;
   border: 1px solid var(--hm-dialog-button-border);
   border-radius: 6px !important;
@@ -820,6 +903,10 @@ html.dark .hm-dialog__title {
 
   .hm-dialog-leave-active .hm-dialog__panel {
     transition: transform 0.32s ease, opacity 0.32s ease;
+  }
+
+  .hm-dialog__confirm {
+    height: 36px;
   }
 }
 
@@ -941,13 +1028,16 @@ html.dark .hm-dialog__title {
   .doc-home .jumbotron {
     padding: 2rem 1.5rem;
   }
+
   .hmdoc-index-main {
     padding-top: 0.75rem !important;
   }
+
   .hmdoc-index-container {
     padding-left: 0;
     padding-right: 0;
   }
+
   .doc-article.hmdoc-index-article {
     width: 98%;
     margin-left: auto;
@@ -958,10 +1048,11 @@ html.dark .hm-dialog__title {
 }
 
 @media (max-width: 575.98px) {
-  main > .container {
+  main>.container {
     padding-left: 0;
     padding-right: 0;
   }
+
   .doc-article {
     border-left: none !important;
     border-right: none !important;
@@ -982,11 +1073,142 @@ html.dark .hm-dialog__title {
 /* Unify button corners across Bootstrap and VitePress components. */
 .btn,
 .VPButton,
-button,
-[type='button'],
+button:not(.plugin-tabs--tab),
+[type='button']:not(.plugin-tabs--tab),
 [type='submit'],
 [type='reset'] {
   border-radius: 15px !important;
+}
+
+/* Doc tab bar: not pills — vitepress-plugin-tabs uses plain <button role="tab">. */
+.doc-article .plugin-tabs:not([data-variant='hm-donate']) .plugin-tabs--tab {
+  border-radius: 0 !important;
+}
+
+/*
+ * Sponsor QR tabs: reproduce YuukaBot docs sponsor page (.vp-tabs / .vp-tab-nav)
+ * from Theme Hope (see https://bot.yunmengdu.cn/about/sponsor — assets/style-*.css).
+ * Maps onto vitepress-plugin-tabs (.plugin-tabs / .plugin-tabs--tab / .plugin-tabs--content).
+ * Declared in markdown as: ::: tabs variant:hm-donate
+ */
+.doc-article .plugin-tabs[data-variant='hm-donate'] {
+  /* Custom theme has no default VitePress :root tokens — always provide fallbacks. */
+  --hm-sponsor-tab-radius: 0.5rem;
+  --hm-sponsor-tab-nav-bg: var(--vp-c-bg-soft, #f1f3f5);
+  --hm-sponsor-tab-nav-hover: var(--vp-c-bg-alt, #e9ecef);
+  --hm-sponsor-tab-panel-bg: var(--vp-c-bg, #fff);
+  margin: 1.5rem 0;
+  border: 1px solid var(--vp-c-border, #dee2e6);
+  border-radius: var(--hm-sponsor-tab-radius);
+  background-color: var(--hm-sponsor-tab-panel-bg);
+  overflow: hidden;
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab-list {
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  border-radius: var(--hm-sponsor-tab-radius) var(--hm-sponsor-tab-radius) 0 0;
+  background: var(--hm-sponsor-tab-nav-bg);
+  transition: background-color 0.25s;
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab-list::after {
+  display: none;
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab {
+  position: relative;
+  min-width: 4rem;
+  margin: 0;
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: var(--hm-sponsor-tab-radius) var(--hm-sponsor-tab-radius) 0 0;
+  background: transparent;
+  color: var(--vp-c-text-1, #212529);
+  font-weight: 600;
+  font-size: 0.875em;
+  line-height: 1.75;
+  cursor: pointer;
+  border-bottom: none;
+  transition:
+    background-color 0.25s,
+    color 0.25s;
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab:hover {
+  background: var(--hm-sponsor-tab-nav-hover);
+  color: var(--vp-c-text-1, #212529);
+}
+
+/* Reuse ::before/::after like Theme Hope tabs; override plugin-tabs' ::after underline. */
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab::before,
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab::after {
+  content: ' ';
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  top: auto;
+  background-color: transparent;
+  background-image: none;
+  transition: none;
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab::before {
+  right: 100%;
+  left: auto;
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab::after {
+  left: 100%;
+  right: auto;
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab[aria-selected='true'] {
+  background: var(--hm-sponsor-tab-panel-bg);
+  color: var(--vp-c-text-1, #212529);
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab[aria-selected='true']::before {
+  background: radial-gradient(16px at left top,
+      transparent 50%,
+      var(--hm-sponsor-tab-panel-bg) 50%);
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab[aria-selected='true']::after {
+  background: radial-gradient(16px at right top,
+      transparent 50%,
+      var(--hm-sponsor-tab-panel-bg) 50%);
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab:first-of-type[aria-selected='true']::before {
+  display: none;
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem 0.75rem;
+  border-radius: 0 0 var(--hm-sponsor-tab-radius) var(--hm-sponsor-tab-radius);
+  background: var(--hm-sponsor-tab-panel-bg);
+}
+
+.doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--content img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+@media print {
+  .doc-article .plugin-tabs[data-variant='hm-donate'] .plugin-tabs--tab-list {
+    display: none;
+  }
 }
 
 .hm-dialog__confirm,
@@ -1172,17 +1394,21 @@ button,
     align-items: stretch;
     padding: 16px;
   }
+
   .group-card-left {
     align-items: center;
   }
+
   .group-card-avatar {
     width: 56px;
     height: 56px;
     border-radius: 12px;
   }
+
   .group-card-info {
     margin-left: 14px;
   }
+
   .group-join-btn {
     margin-left: 0;
     margin-top: 14px;
@@ -1257,9 +1483,11 @@ button,
 .mobile-menu-btn.open .mobile-menu-icon span:nth-child(1) {
   background-color: #007bff;
 }
+
 .mobile-menu-btn.open .mobile-menu-icon span:nth-child(2) {
   background-color: #007bff;
 }
+
 .mobile-menu-btn.open .mobile-menu-icon span:nth-child(3) {
   background-color: #007bff;
 }
@@ -1323,7 +1551,7 @@ button,
 
 /* ── Footer 手机端三行居中 ── */
 @media (max-width: 767.98px) {
-  .site-shell > footer {
+  .site-shell>footer {
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
     overflow: hidden;
