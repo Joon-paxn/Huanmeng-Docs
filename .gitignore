@@ -1,4 +1,4 @@
-# 依赖（体积大，可用 lock 文件重装）
+# 依赖
 node_modules/
 
 # 若在 config 里把 outDir / cacheDir / .temp 指到仓库根目录，再靠下面三行兜底
