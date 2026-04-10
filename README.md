@@ -19,7 +19,7 @@
 简要流程：
 
 ```shell
-1. 拉取源码到本地 git clone https://github.com/HuanmengX/Huanmeng-Docs.git
+1. 拉取源码到本地 git clone https://github.com/BingKKni/Huanmeng-Docs.git
 2. 进入 src 目录，执行 npm install 安装依赖。
 3. 执行 npm run docs:dev 启动本地预览（默认监听 0.0.0.0:23333），您可在浏览器中预览网页。在dev模式下，每一次修改都会自动更新网页。
 4. 修改完毕后，使用 npm run docs:build 构建网页，构建输出位于 .vitepress/dist/ 目录。
