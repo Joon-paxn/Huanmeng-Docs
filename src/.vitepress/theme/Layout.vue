@@ -9,29 +9,42 @@ const rawDocs = import.meta.glob('../../docs/**/*.md', { query: '?raw', import: 
 const searchActive = ref(false)
 const searchQuery = ref('')
 const searchInputRef = ref(null)
+const mobileSearchInputRef = ref(null)
+const globalSearchModalActive = ref(false)
+const globalSearchInputRef = ref(null)
+
+// Regex patterns pre-compiled
+const mdStripRegexes = [
+  { p: /^---[\s\S]*?^---/m, r: '' }, // strip frontmatter
+  { p: /```[\s\S]*?```/g, r: '' }, // strip code blocks
+  { p: /`([^`]+)`/g, r: '$1' }, // inline code
+  { p: /<[^>]*>/g, r: '' }, // html
+  { p: /!\[[^\]]*\]\([^)]*\)/g, r: '' }, // images
+  { p: /\[([^\]]+)\]\([^)]+\)/g, r: '$1' }, // links
+  { p: /^#{1,6}\s+/gm, r: '' }, // ATX headers
+  { p: /^==\s+/gm, r: '' }, // strip tab markers
+  { p: /(?:\*\*|__)(.*?)(?:\*\*|__)/g, r: '$1' }, // bold
+  { p: /(?:\*|_)(.*?)(?:\*|_)/g, r: '$1' }, // italic
+  { p: /^\s*>\s+/gm, r: '' }, // blockquotes
+  { p: /^\s*[-*+]\s+/gm, r: '' }, // lists
+  { p: /^\s*\d+\.\s+/gm, r: '' }, // ordered lists
+  { p: /^:::\s*\w*.*$/gm, r: '' }, // custom blocks
+  { p: /:::/g, r: '' },
+  { p: /\n+/g, r: ' ' } // condense newlines
+]
 
 function stripMarkdown(str) {
-  return str
-    .replace(/^---[\s\S]*?^---/m, '') // strip frontmatter
-    .replace(/```[\s\S]*?```/g, '') // strip code blocks
-    .replace(/`([^`]+)`/g, '$1') // inline code
-    .replace(/<[^>]*>/g, '') // html
-    .replace(/!\[[^\]]*\]\([^)]*\)/g, '') // remove images completely to avoid matching custom size attributes like #350px
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
-    .replace(/^#{1,6}\s+/gm, '') // ATX headers
-    .replace(/^==\s+/gm, '') // strip tab markers
-    .replace(/(?:\*\*|__)(.*?)(?:\*\*|__)/g, '$1') // bold
-    .replace(/(?:\*|_)(.*?)(?:\*|_)/g, '$1') // italic
-    .replace(/^\s*>\s+/gm, '') // blockquotes
-    .replace(/^\s*[-*+]\s+/gm, '') // lists
-    .replace(/^\s*\d+\.\s+/gm, '') // ordered lists
-    .replace(/^:::\s*\w*.*$/gm, '') // custom blocks
-    .replace(/:::/g, '')
-    .replace(/\n+/g, ' ') // condense newlines
-    .trim()
+  let result = str
+  for (const { p, r } of mdStripRegexes) {
+    result = result.replace(p, r)
+  }
+  return result.trim()
 }
 
-const allDocsContent = computed(() => {
+// Compute allDocsContent once since rawDocs doesn't change during navigation
+let cachedAllDocsContent = null
+function getAllDocsContent() {
+  if (cachedAllDocsContent) return cachedAllDocsContent
   const arr = []
   for (const path in rawDocs) {
     const rawContent = rawDocs[path] || ''
@@ -44,7 +57,6 @@ const allDocsContent = computed(() => {
     
     let title = ''
     try {
-      // Try to find if link exists in sidebar links for proper titles
       for (const item of [...navLinks, ...desktopSidebarLinks]) {
          const itemHrefBase = item.href.replace(/\/$/, '')
          const linkBase = link.replace(/\/$/, '')
@@ -53,7 +65,7 @@ const allDocsContent = computed(() => {
             break
          }
       }
-    } catch { /* ignore if not defined yet */ }
+    } catch { /* ignore */ }
     
     if (!title) {
        const titleMatch = rawContent.match(/^#\s+(.*)/m)
@@ -74,17 +86,21 @@ const allDocsContent = computed(() => {
     const content = stripMarkdown(rawContent)
     arr.push({ title, link, content })
   }
+  cachedAllDocsContent = arr
   return arr
-})
+}
 
 const searchResults = computed(() => {
   if (!searchQuery.value.trim()) return []
   const query = searchQuery.value.toLowerCase()
   const results = []
+  const docs = getAllDocsContent()
   
-  for (const doc of allDocsContent.value) {
+  for (let i = 0, len = docs.length; i < len; i++) {
+    const doc = docs[i]
     const rawContent = doc.content
     const lowerContent = rawContent.toLowerCase()
+    
     let index = lowerContent.indexOf(query)
     if (index !== -1) {
       const snippetStart = Math.max(0, index - 30)
@@ -105,6 +121,7 @@ const searchResults = computed(() => {
         match: snippetMatch,
         snippetAfter
       })
+      if (results.length >= 10) break // limit to top 10 results for better performance
     }
   }
   return results
@@ -113,6 +130,7 @@ const searchResults = computed(() => {
 function handleResultClick() {
   searchQuery.value = ''
   searchActive.value = false
+  closeMobileMenu()
 }
 
 function handleSearchIconClick() {
@@ -125,6 +143,30 @@ function handleSearchIconClick() {
     searchActive.value = false
     searchQuery.value = ''
   }
+}
+
+function handleMobileSearchClick() {
+  if (isMobileViewport()) {
+    if (!menuOpen.value) {
+      menuOpen.value = true
+      nextTick(() => {
+        mobileSearchInputRef.value?.focus()
+      })
+    } else {
+      mobileSearchInputRef.value?.focus()
+    }
+  } else {
+    // Desktop Home fallback
+    globalSearchModalActive.value = true
+    nextTick(() => {
+      globalSearchInputRef.value?.focus()
+    })
+  }
+}
+
+function closeGlobalSearch() {
+  globalSearchModalActive.value = false
+  searchQuery.value = ''
 }
 function handleSearchBlur() {
   setTimeout(() => {
@@ -154,21 +196,12 @@ const navLinks = [
 const desktopSidebarLinks = [
   { href: '/docs/', label: '🏠 首页', isActive: relativePath => relativePath === 'docs/index.md' },
   { 
-    href: '/docs/delta_force/', 
+    href: '/docs/entertainment/', 
     label: '✨ 娱乐功能', 
     isActive: relativePath => relativePath === 'docs/entertainment/index.md',
     hasAnyActive: relativePath => relativePath === 'docs/entertainment/index.md' || relativePath.startsWith('docs/entertainment/'),
     children: [
       { href: '/docs/entertainment/signin.html', label: '打卡', isActive: relativePath => relativePath === 'docs/entertainment/signin.md' }
-    ]
-  },
-  { 
-    href: '/docs/faq/', 
-    label: '❓ 常见问题FAQ', 
-    isActive: relativePath => relativePath === 'docs/faq/index.md',
-    hasAnyActive: relativePath => relativePath === 'docs/faq/index.md' || relativePath.startsWith('docs/faq/'),
-    children: [
-      { href: '/docs/faq/appeal.html', label: '封禁申诉', isActive: relativePath => relativePath === 'docs/faq/appeal.md' }
     ]
   },
   { 
@@ -178,6 +211,15 @@ const desktopSidebarLinks = [
     hasAnyActive: relativePath => relativePath === 'docs/delta_force/index.md' || relativePath.startsWith('docs/delta_force/'),
     children: [
       { href: '/docs/delta_force/password.html', label: '每日密码门位置', isActive: relativePath => relativePath === 'docs/delta_force/password.md' }
+    ]
+  },
+  { 
+    href: '/docs/faq/', 
+    label: '❓ 常见问题FAQ', 
+    isActive: relativePath => relativePath === 'docs/faq/index.md',
+    hasAnyActive: relativePath => relativePath === 'docs/faq/index.md' || relativePath.startsWith('docs/faq/'),
+    children: [
+      { href: '/docs/faq/appeal.html', label: '封禁申诉', isActive: relativePath => relativePath === 'docs/faq/appeal.md' }
     ]
   },
   { href: '/docs/support.html', label: '🧋 支持幻梦', isActive: relativePath => relativePath === 'docs/support.md' },
@@ -215,6 +257,7 @@ const currentPageLabel = computed(() => {
 })
 const shouldShowDesktopSidebar = computed(() => page.value.relativePath.startsWith('docs/'))
 
+const mobileSidebarOpen = ref(false)
 const menuOpen = ref(false)
 /** 关闭菜单时延迟到面板收起动画结束再撤掉顶栏 overflow，否则下拉层会被立刻裁掉 */
 const mobileNavClosingHold = ref(false)
@@ -807,6 +850,25 @@ function startLightboxCloseAnimation() {
 }
 
 function handleDocumentKeydown(e) {
+  // --- Intercept Ctrl+F and Ctrl+K ---
+  const isSearchKey = (e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'f' || e.key.toLowerCase() === 'k')
+  if (isSearchKey) {
+    e.preventDefault()
+    if (isMobileViewport()) {
+      handleMobileSearchClick()
+    } else if (shouldShowDesktopSidebar.value) {
+      if (!searchActive.value) {
+        handleSearchIconClick()
+      } else {
+        searchInputRef.value?.focus()
+      }
+    } else {
+      // Fallback for pages without sidebar (e.g. Home)
+      handleMobileSearchClick()
+    }
+    return
+  }
+
   if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
     const article = docArticleRef.value
     const tab = e.target?.closest?.('button.plugin-tabs--tab')
@@ -829,6 +891,11 @@ function handleDocumentKeydown(e) {
       return
     }
     startLightboxCloseAnimation()
+    return
+  }
+
+  if (globalSearchModalActive.value) {
+    closeGlobalSearch()
     return
   }
 
@@ -1307,6 +1374,10 @@ onBeforeUnmount(() => {
 watch(
   () => page.value.relativePath,
   () => {
+    searchQuery.value = ''
+    searchActive.value = false
+    closeMobileMenu()
+
     closeInfoDialog()
     forceCloseLightbox()
     resetMobileHeaderState()
@@ -1552,6 +1623,18 @@ watch(infoDialogVisible, async visible => {
           @transitionend.self="onMobileNavTransitionEnd"
         >
           <div class="mobile-nav-inner">
+            <!-- 移动端搜索框 -->
+            <div class="mobile-nav-search pt-3 px-3">
+              <div class="mobile-search-box">
+                <input 
+                  ref="mobileSearchInputRef"
+                  v-model="searchQuery" 
+                  type="text" 
+                  placeholder="搜索文档..." 
+                />
+                <svg class="mobile-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              </div>
+            </div>
             <nav id="mobile-site-nav" class="nav nav-pills mobile-nav-grid pt-2 pb-1" aria-label="移动端站点导航">
               <a
                 v-for="link in navLinks"
@@ -1588,12 +1671,23 @@ watch(infoDialogVisible, async visible => {
 
     <!-- 点击遮罩关闭移动端菜单 -->
     <Transition name="mobile-nav-backdrop-fade">
-      <div v-if="menuOpen" class="mobile-nav-backdrop d-md-none" @click="closeMobileMenu"></div>
+      <div v-if="menuOpen && !searchQuery.trim()" class="mobile-nav-backdrop d-md-none" @click="closeMobileMenu"></div>
     </Transition>
+
+    <!-- 移动端呼出侧边栏按钮 -->
+    <button
+      v-if="shouldShowDesktopSidebar && !mobileSidebarOpen"
+      class="mobile-sidebar-trigger d-lg-none"
+      @click="mobileSidebarOpen = true"
+      aria-label="打开侧边栏"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+    </button>
 
     <aside
       v-if="shouldShowDesktopSidebar"
-      class="desktop-doc-sidebar d-none d-lg-block"
+      class="desktop-doc-sidebar"
+      :class="{ 'mobile-open': mobileSidebarOpen }"
       aria-label="文档快捷入口"
     >
       <nav class="desktop-doc-sidebar__panel">
@@ -1609,9 +1703,14 @@ watch(infoDialogVisible, async visible => {
               @blur="handleSearchBlur"
             />
           </div>
-          <button class="sidebar-search-trigger" @click="handleSearchIconClick" aria-label="搜索文档">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </button>
+          <div class="sidebar-header-actions">
+            <button class="sidebar-search-trigger" @click="handleSearchIconClick" aria-label="搜索文档">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+            <button class="sidebar-close-trigger d-lg-none" @click="mobileSidebarOpen = false" aria-label="收起侧边栏">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="11 17 6 12 11 7"></polyline><polyline points="18 17 13 12 18 7"></polyline></svg>
+            </button>
+          </div>
         </div>
         <hr class="desktop-doc-sidebar__divider" />
         <div v-for="link in desktopSidebarLinks" :key="`desktop-sidebar-${link.href}`" class="desktop-doc-sidebar__group">
@@ -1690,7 +1789,7 @@ watch(infoDialogVisible, async visible => {
           <article
             v-else
             key="vp-route-search"
-            class="search-results-article bg-white border shadow-sm p-4 p-md-5"
+            class="doc-article search-results-article bg-white border shadow-sm p-4 p-md-5"
           >
             <h1 class="mb-4">搜索结果（共{{ searchResults.length }}条）</h1>
             <hr class="mb-4"/>
@@ -1791,5 +1890,29 @@ watch(infoDialogVisible, async visible => {
         </div>
       </div>
     </div>
+
+    <!-- 全局搜索弹窗 (Fallback / Mobile) -->
+    <Transition name="search-modal">
+      <div v-if="globalSearchModalActive" class="hm-search-modal" role="dialog" aria-modal="true">
+        <div class="hm-search-modal__backdrop" @click="closeGlobalSearch"></div>
+        <div class="hm-search-modal__container">
+          <div class="hm-search-modal__box">
+            <svg class="hm-search-modal__icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input 
+              ref="globalSearchInputRef"
+              v-model="searchQuery" 
+              type="text" 
+              placeholder="搜索文档..." 
+              @keydown.esc="closeGlobalSearch"
+              @keydown.enter="closeGlobalSearch"
+            />
+            <button class="hm-search-modal__close" @click="closeGlobalSearch" title="关闭">Esc</button>
+          </div>
+          <div class="hm-search-modal__tips">
+            输入关键词自动展示结果，按 Enter 查看，Esc 退出
+          </div>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>

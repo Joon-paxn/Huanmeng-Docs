@@ -465,6 +465,193 @@ a:hover {
   }
 }
 
+.sidebar-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-close-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: #6c757d;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sidebar-close-trigger:hover {
+  background-color: #e9ecef;
+}
+
+@media (max-width: 991.98px) {
+  .mobile-sidebar-trigger {
+    position: fixed;
+    left: 0;
+    top: 30%;
+    transform: translateY(-50%);
+    z-index: 900;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    padding: 5px 10px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.08);
+    color: #6c757d;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease, color 0.2s;
+  }
+
+  .mobile-sidebar-trigger:hover {
+    background: #f1f4f6;
+    color: #495057;
+  }
+
+  .desktop-doc-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 280px;
+    z-index: 1050;
+    pointer-events: none;
+    transform: translateX(-100%);
+    transition: transform 0.15s linear;
+  }
+
+  .desktop-doc-sidebar.mobile-open {
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .desktop-doc-sidebar__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    padding: 10px;
+    padding-top: 15px;
+    padding-bottom: 60px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.98);
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 4px 0 16px rgba(15, 23, 42, 0.06);
+  }
+
+  .desktop-doc-sidebar__heading {
+    display: block;
+    padding: 8px 10px 0;
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .desktop-doc-sidebar__divider {
+    width: 90%;
+    margin: 2px 0px 10px 10px;
+    border: none;
+    border-top: 0.8px solid #e3e9f1;
+  }
+
+  .desktop-doc-sidebar__link {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0.5rem 0.75rem;
+    color: #495057;
+    text-decoration: none;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background-color: transparent;
+  }
+
+  .desktop-doc-sidebar__link:hover {
+    color: #212529;
+    background-color: #e9ecef;
+  }
+
+  .desktop-doc-sidebar__link.active {
+    color: #212529;
+    background-color: #e9ecef;
+  }
+
+  .desktop-doc-sidebar__link.active:hover {
+    background-color: #dde2e6;
+  }
+
+  .desktop-doc-sidebar__group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .desktop-doc-sidebar__link.has-children {
+    justify-content: space-between;
+  }
+
+  .sidebar-menu-icon {
+    width: 14px;
+    height: 14px;
+    margin-left: auto;
+    color: #6c757d;
+    transition: transform 0.2s ease;
+  }
+
+  .sidebar-menu-icon.expanded {
+    transform: rotate(90deg);
+  }
+
+  .desktop-doc-sidebar__children {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.2s ease, margin-top 0.2s;
+    overflow: hidden;
+  }
+
+  .desktop-doc-sidebar__children.expanded {
+    grid-template-rows: 1fr;
+    margin: 6px 0px 0px 0px;
+  }
+
+  .desktop-doc-sidebar__children-inner {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .desktop-doc-sidebar__child-link {
+    display: flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 0.4rem 0.75rem 0.4rem 2.4rem;
+    color: #555c63;
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .desktop-doc-sidebar__child-link:hover {
+    color: #212529;
+    background-color: #f1f4f6;
+  }
+
+  .desktop-doc-sidebar__child-link.active {
+    font-weight: 400;
+    background-color: #f1f4f6;
+  }
+}
+
 .doc-home .jumbotron {
   margin-bottom: 2rem;
   border-radius: 1rem;
@@ -474,7 +661,8 @@ a:hover {
   border-radius: 0.75rem;
 }
 
-.doc-article {
+.doc-article,
+.search-results-article {
   border-radius: 0;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
 }
@@ -1159,7 +1347,7 @@ html.dark .hm-dialog__title {
   }
 
   .doc-article.hmdoc-index-article {
-    width: 98%;
+    width: 96%;
     margin-left: auto;
     margin-right: auto;
     border: 1px solid rgba(222, 226, 230, 0.95) !important;
@@ -1167,13 +1355,14 @@ html.dark .hm-dialog__title {
   }
 }
 
-@media (max-width: 575.98px) {
+@media (max-width: 767.98px) {
   main>.container {
     padding-left: 0;
     padding-right: 0;
   }
 
-  .doc-article {
+  .doc-article,
+  .search-results-article {
     border-left: none !important;
     border-right: none !important;
     width: 96%;
@@ -1193,8 +1382,8 @@ html.dark .hm-dialog__title {
 /* Unify button corners across Bootstrap and VitePress components. */
 .btn,
 .VPButton,
-button:not(.plugin-tabs--tab):not([class*='hm-dialog__']),
-[type='button']:not(.plugin-tabs--tab):not([class*='hm-dialog__']),
+button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']),
+[type='button']:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']),
 [type='submit'],
 [type='reset'] {
   border-radius: 15px !important;
@@ -1206,10 +1395,8 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']),
 }
 
 /*
- * Sponsor QR tabs: reproduce YuukaBot docs sponsor page (.vp-tabs / .vp-tab-nav)
- * from Theme Hope (see https://bot.yunmengdu.cn/about/sponsor — assets/style-*.css).
- * Maps onto vitepress-plugin-tabs (.plugin-tabs / .plugin-tabs--tab / .plugin-tabs--content).
- * Declared in markdown as: ::: tabs variant:hm-donate
+ * 图片多标签页，UI参考 YuukaBot 的文档 (.vp-tabs / .vp-tab-nav)
+ * 地址: https://bot.yunmengdu.cn/about/sponsor — assets/style-*.css
  */
 .doc-article .plugin-tabs[data-variant='hm-donate'] {
   /* Custom theme has no default VitePress :root tokens — always provide fallbacks. */
@@ -1836,4 +2023,172 @@ html.dark .search-result-snippet {
 html.dark .search-highlight {
   background-color: rgba(255, 193, 7, 0.3);
   color: #f8f9fa;
+}
+
+/* ── 移动端搜索增强 ── */
+
+.mobile-nav-search {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+  margin-bottom: 0;
+  padding-bottom: 0.6rem;
+}
+
+.mobile-search-box {
+  position: relative;
+  width: 100%;
+}
+
+.mobile-search-box input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px 0 40px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.02);
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.mobile-search-box input:focus {
+  border-color: #007bff;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+}
+
+.mobile-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #adb5bd;
+  pointer-events: none;
+}
+
+html.dark .mobile-header-search-btn {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #adb5bd;
+}
+
+html.dark .mobile-nav-search {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark .mobile-search-box input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #f8f9fa;
+}
+
+html.dark .mobile-search-box input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #007bff;
+}
+
+/* ── 全局搜索弹窗 (Desktop Home Fallback) ── */
+.hm-search-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+}
+
+.hm-search-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(8px);
+}
+
+.hm-search-modal__container {
+  position: relative;
+  width: 90%;
+  max-width: 600px;
+  animation: modal-slide-down 0.3s cubic-bezier(0.1, 0.8, 0.2, 1);
+}
+
+.hm-search-modal__box {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  height: 60px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hm-search-modal__icon {
+  color: #6c757d;
+  flex-shrink: 0;
+}
+
+.hm-search-modal__box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0 16px;
+  font-size: 1.15rem;
+  outline: none;
+  color: #212529;
+}
+
+.hm-search-modal__close {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  background: #f1f3f5;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  color: #6c757d;
+  cursor: pointer;
+}
+
+.hm-search-modal__tips {
+  margin-top: 12px;
+  text-align: center;
+  color: #fff;
+  font-size: 0.875rem;
+  opacity: 0.8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes modal-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Transition for search-modal-fade */
+.search-modal-enter-active,
+.search-modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.search-modal-enter-from,
+.search-modal-leave-to {
+  opacity: 0;
+}
+
+html.dark .hm-search-modal__box {
+  background: #1a1b1e;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark .hm-search-modal__box input {
+  color: #f8f9fa;
+}
+
+html.dark .hm-search-modal__close {
+  background: #2c2e33;
+  border-color: #373a40;
+  color: #adb5bd;
 }
