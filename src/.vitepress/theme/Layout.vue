@@ -154,11 +154,40 @@ const navLinks = [
   }
 ]
 
+/* 侧边栏定义 */
 const desktopSidebarLinks = [
   { href: '/docs/', label: '🏠 首页', isActive: relativePath => relativePath === 'docs/index.md' },
-  { href: '/docs/frequently_asked_questions.html', label: '❓ 常见问题FAQ', isActive: relativePath => relativePath === 'docs/frequently_asked_questions.md' },
+  { 
+    href: '/docs/faq/', 
+    label: '❓ 常见问题FAQ', 
+    isActive: relativePath => relativePath === 'docs/faq/index.md',
+    hasAnyActive: relativePath => relativePath === 'docs/faq/index.md' || relativePath.startsWith('docs/faq/'),
+    children: [
+      { href: '/docs/faq/appeal.html', label: '封禁申诉', isActive: relativePath => relativePath === 'docs/faq/appeal.md' }
+    ]
+  },
   { href: '/docs/support.html', label: '🧋 支持幻梦', isActive: relativePath => relativePath === 'docs/support.md' }
 ]
+
+const expandedSidebarKeys = ref({})
+
+watch(() => page.value.relativePath, (newPath) => {
+  desktopSidebarLinks.forEach(link => {
+    if (link.children && link.hasAnyActive && link.hasAnyActive(newPath)) {
+      expandedSidebarKeys.value[link.href] = true
+    }
+  })
+}, { immediate: true })
+
+function handleSidebarLinkClick(e, link) {
+  if (!link.children) return
+  if (isActiveLink(link)) {
+    e.preventDefault()
+    expandedSidebarKeys.value[link.href] = !expandedSidebarKeys.value[link.href]
+  } else {
+    expandedSidebarKeys.value[link.href] = true
+  }
+}
 
 const currentYear = new Date().getFullYear()
 /** 文档/首页切换时驱动淡入淡出（与导航切换同一套 key） */
@@ -1564,16 +1593,43 @@ watch(infoDialogVisible, async visible => {
           </button>
         </div>
         <hr class="desktop-doc-sidebar__divider" />
-        <a
-          v-for="link in desktopSidebarLinks"
-          :key="`desktop-sidebar-${link.href}`"
-          class="desktop-doc-sidebar__link"
-          :class="{ active: isActiveLink(link) }"
-          :href="getNavHref(link)"
-          :aria-current="isActiveLink(link) ? 'page' : undefined"
-        >
-          {{ link.label }}
-        </a>
+        <div v-for="link in desktopSidebarLinks" :key="`desktop-sidebar-${link.href}`" class="desktop-doc-sidebar__group">
+          <a
+            class="desktop-doc-sidebar__link"
+            :class="{ active: isActiveLink(link), 'has-children': link.children }"
+            :href="getNavHref(link)"
+            :aria-current="isActiveLink(link) ? 'page' : undefined"
+            @click="handleSidebarLinkClick($event, link)"
+          >
+            {{ link.label }}
+            <svg 
+              v-if="link.children" 
+              class="sidebar-menu-icon" 
+              :class="{ expanded: expandedSidebarKeys[link.href] }"
+              xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            >
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </a>
+          <div 
+            v-if="link.children" 
+            class="desktop-doc-sidebar__children"
+            :class="{ expanded: expandedSidebarKeys[link.href] }"
+          >
+            <div class="desktop-doc-sidebar__children-inner">
+              <a
+                v-for="child in link.children"
+                :key="`desktop-sidebar-child-${child.href}`"
+                class="desktop-doc-sidebar__child-link"
+                :class="{ active: child.isActive(page.relativePath) }"
+                :href="getNavHref(child)"
+                :aria-current="child.isActive(page.relativePath) ? 'page' : undefined"
+              >
+                {{ child.label }}
+              </a>
+            </div>
+          </div>
+        </div>
       </nav>
     </aside>
 

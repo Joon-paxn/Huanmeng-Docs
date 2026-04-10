@@ -384,6 +384,69 @@ a:hover {
   .desktop-doc-sidebar__link.active:hover {
     background-color: #dde2e6;
   }
+
+  /* 侧边栏子菜单相关样式 */
+  .desktop-doc-sidebar__group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .desktop-doc-sidebar__link.has-children {
+    justify-content: space-between;
+  }
+
+  .sidebar-menu-icon {
+    width: 14px;
+    height: 14px;
+    margin-left: auto;
+    color: #6c757d;
+    transition: transform 0.2s ease;
+  }
+
+  .sidebar-menu-icon.expanded {
+    transform: rotate(90deg);
+  }
+
+  .desktop-doc-sidebar__children {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.2s ease, margin-top 0.2s;
+    overflow: hidden;
+  }
+
+  .desktop-doc-sidebar__children.expanded {
+    grid-template-rows: 1fr;
+    margin: 6px 0px 0px 0px;
+  }
+
+  .desktop-doc-sidebar__children-inner {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .desktop-doc-sidebar__child-link {
+    display: flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 0.4rem 0.75rem 0.4rem 2.4rem;
+    color: #555c63;
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .desktop-doc-sidebar__child-link:hover {
+    color: #212529;
+    background-color: #f1f4f6;
+  }
+
+  .desktop-doc-sidebar__child-link.active {
+    font-weight: 500;
+    background-color: #f1f4f6;
+  }
 }
 
 .doc-home .jumbotron {
