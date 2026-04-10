@@ -158,6 +158,15 @@ const navLinks = [
 const desktopSidebarLinks = [
   { href: '/docs/', label: '🏠 首页', isActive: relativePath => relativePath === 'docs/index.md' },
   { 
+    href: '/docs/delta_force/', 
+    label: '✨ 娱乐功能', 
+    isActive: relativePath => relativePath === 'docs/entertainment/index.md',
+    hasAnyActive: relativePath => relativePath === 'docs/entertainment/index.md' || relativePath.startsWith('docs/entertainment/'),
+    children: [
+      { href: '/docs/entertainment/signin.html', label: '打卡', isActive: relativePath => relativePath === 'docs/entertainment/signin.md' }
+    ]
+  },
+  { 
     href: '/docs/faq/', 
     label: '❓ 常见问题FAQ', 
     isActive: relativePath => relativePath === 'docs/faq/index.md',
@@ -166,7 +175,16 @@ const desktopSidebarLinks = [
       { href: '/docs/faq/appeal.html', label: '封禁申诉', isActive: relativePath => relativePath === 'docs/faq/appeal.md' }
     ]
   },
-  { href: '/docs/support.html', label: '🧋 支持幻梦', isActive: relativePath => relativePath === 'docs/support.md' }
+  { 
+    href: '/docs/delta_force/', 
+    label: '🗺️ 三角洲行动攻略', 
+    isActive: relativePath => relativePath === 'docs/delta_force/index.md',
+    hasAnyActive: relativePath => relativePath === 'docs/delta_force/index.md' || relativePath.startsWith('docs/delta_force/'),
+    children: [
+      { href: '/docs/delta_force/password.html', label: '每日密码门位置', isActive: relativePath => relativePath === 'docs/delta_force/password.md' }
+    ]
+  },
+  { href: '/docs/support.html', label: '🧋 支持幻梦', isActive: relativePath => relativePath === 'docs/support.md' },
 ]
 
 const expandedSidebarKeys = ref({})
