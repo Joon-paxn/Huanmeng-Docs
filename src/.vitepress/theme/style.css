@@ -1,5 +1,5 @@
 html {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter Variable', 'Noto Sans SC', system-ui, -apple-system, sans-serif;
   scrollbar-gutter: stable;
 }
 
@@ -285,7 +285,7 @@ a:hover {
   padding-bottom: 0.55rem;
   padding-left: 1.25rem;
   padding-right: 1.25rem;
-  border-radius: 15px;
+  border-radius: 12px;
   border: 1px solid transparent;
   transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 }
@@ -450,7 +450,7 @@ a:hover {
     color: #555c63;
     text-decoration: none;
     font-size: 0.95rem;
-    border-radius: 6px;
+    border-radius: 8px;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
@@ -480,7 +480,7 @@ a:hover {
   color: #6c757d;
   background: transparent;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -637,7 +637,7 @@ a:hover {
     color: #555c63;
     text-decoration: none;
     font-size: 0.95rem;
-    border-radius: 6px;
+    border-radius: 8px;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
@@ -688,7 +688,7 @@ a:hover {
 }
 
 .doc-article h2 {
-  margin-top: 1rem;
+  margin-top: 2.5rem;
   margin-bottom: 1rem;
   padding-bottom: 0;
   font-size: 1.5rem;
@@ -939,7 +939,7 @@ div[class*='language-']>.copy[data-copy-state='error'] {
 .doc-article table td {
   border-width: 1px 0;
   border-style: solid;
-  border-color: #4b5563;
+  border-color: #dee2e6;
   padding: 0.4rem 0.75rem;
 }
 
@@ -1015,7 +1015,7 @@ div[class*='language-']>.copy[data-copy-state='error'] {
   height: 28px;
   padding: 0;
   border: none;
-  border-radius: 6px !important;
+  border-radius: 8px !important;
   background: transparent;
   color: var(--hm-dialog-text-color);
   font-size: 1.875rem;
@@ -1076,7 +1076,7 @@ html.dark .hm-dialog__title {
   height: 32px;
   padding: 0 1.25rem;
   border: 1px solid var(--hm-dialog-button-border);
-  border-radius: 6px !important;
+  border-radius: 8px !important;
   background: var(--hm-dialog-button-bg);
   color: var(--hm-dialog-button-text);
   font-size: 0.9rem;
@@ -1386,7 +1386,7 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
 [type='button']:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']),
 [type='submit'],
 [type='reset'] {
-  border-radius: 15px !important;
+  border-radius: 12px !important;
 }
 
 /* Doc tab bar: not pills — vitepress-plugin-tabs uses plain <button role="tab">. */
@@ -1521,7 +1521,7 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
 .hm-dialog__confirm,
 .hm-dialog__cancel,
 .hm-dialog__close {
-  border-radius: 6px !important;
+  border-radius: 8px !important;
 }
 
 /* Increase horizontal padding for main action buttons. */
@@ -1647,7 +1647,7 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
 .group-card-avatar {
   width: 72px;
   height: 72px;
-  border-radius: 14px;
+  border-radius: 12px;
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -1678,7 +1678,7 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
   padding: 10px 22px;
   background-color: #007bff;
   color: #fff !important;
-  border-radius: 10px;
+  border-radius: 12px;
   text-decoration: none !important;
   font-size: 1rem;
   font-weight: 400;
@@ -1737,7 +1737,7 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
   padding: 0;
   background: none;
   border: 1.5px solid #ced4da;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   flex-shrink: 0;
@@ -1822,7 +1822,7 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
 .mobile-nav .nav-link {
   width: 100%;
   min-height: 44px;
-  border-radius: 10px;
+  border-radius: 12px;
   text-align: left;
   display: flex;
   align-items: center;
@@ -1905,7 +1905,7 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
   width: 100%;
   height: 32px;
   padding: 0 10px;
-  border-radius: 6px;
+  border-radius: 8px;
   border: 1px solid rgba(0, 0, 0, 0.15);
   background: rgba(0, 0, 0, 0.03);
   font-size: 0.95rem;
@@ -1925,7 +1925,7 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
   width: 28px;
   height: 28px;
   padding: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   color: #6c757d;
   background: transparent;
   border: none;
@@ -2112,7 +2112,7 @@ html.dark .mobile-search-box input:focus {
 
 .hm-search-modal__box {
   background: #fff;
-  border-radius: 14px;
+  border-radius: 12px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
@@ -2141,7 +2141,7 @@ html.dark .mobile-search-box input:focus {
   font-size: 0.75rem;
   background: #f1f3f5;
   border: 1px solid #dee2e6;
-  border-radius: 6px;
+  border-radius: 8px;
   color: #6c757d;
   cursor: pointer;
 }
@@ -2361,7 +2361,7 @@ html.dark .hm-search-modal__close {
     color: #555c63;
     text-decoration: none;
     font-size: 0.95rem;
-    border-radius: 6px;
+    border-radius: 8px;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
 
