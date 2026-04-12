@@ -202,9 +202,9 @@ const desktopSidebarLinks = [
     hasAnyActive: relativePath => relativePath === 'docs/entertainment/index.md' || relativePath.startsWith('docs/entertainment/'),
     children: [
       { href: '/docs/entertainment/signin.html', label: '打卡', isActive: relativePath => relativePath === 'docs/entertainment/signin.md' },
-      { href: '/docs/entertainment/favorability.html', label: '好感度', isActive: relativePath => relativePath === 'docs/entertainment/favorability.md' },
-      { href: '/docs/entertainment/random_pic.html', label: '随机图', isActive: relativePath => relativePath === 'docs/entertainment/random_pic.md' },
-      { href: '/docs/entertainment/luck.html', label: '运势', isActive: relativePath => relativePath === 'docs/entertainment/luck.md' },
+      { href: '/docs/entertainment/sence.html', label: '好感度', isActive: relativePath => relativePath === 'docs/entertainment/sence.md' },
+      { href: '/docs/entertainment/random_image.html', label: '随机图', isActive: relativePath => relativePath === 'docs/entertainment/random_image.md' },
+      { href: '/docs/entertainment/fortune.html', label: '运势', isActive: relativePath => relativePath === 'docs/entertainment/fortune.md' },
       { href: '/docs/entertainment/paint_bomb.html', label: '油漆炸弹', isActive: relativePath => relativePath === 'docs/entertainment/paint_bomb.md' }
     ]
   },

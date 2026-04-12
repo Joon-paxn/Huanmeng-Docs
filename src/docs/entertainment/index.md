@@ -25,7 +25,7 @@
         </a>
     </div>
     <div>
-        <a href="favorability">
+        <a href="sence">
             <img src="https://docs.gtimg.com/docs-design-resources/individuation/desktop/tmoji/google_emoji/svg/emoji_u2764-ce9b22dafb.svg" width="20" height="20" draggable="false">
             好感度
         </a>
@@ -33,12 +33,12 @@
 </div>
 <div style="column-count: 2; column-gap: 20px; height: 40px;">
     <div>
-        <a href="luck">
+        <a href="fortune">
             ☘今日运势
         </a>
     </div>
     <div>
-        <a href="random_pic">
+        <a href="random_image">
             🖼️随机图
         </a>
     </div>
