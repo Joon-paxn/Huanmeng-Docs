@@ -182,8 +182,8 @@ a:hover {
   width: 0;
   margin: 0;
   box-sizing: border-box;
-  background: linear-gradient(90deg, #007bff 0%, #9fd6ff 100%);
-  box-shadow: 0 0 10px rgba(0, 123, 255, 0.28);
+  background-color: #0076ff;
+  box-shadow: 0 0 10px rgba(0, 118, 255, 0.28);
 }
 
 .site-nav-route-progress__fill--smooth {
@@ -289,8 +289,8 @@ a:hover {
     width: 0;
     margin: 0;
     box-sizing: border-box;
-    background: linear-gradient(90deg, #007bff 0%, #9fd6ff 100%);
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.28);
+    background-color: #0076ff;
+    box-shadow: 0 0 10px rgba(0, 118, 255, 0.28);
   }
 
   .site-nav-route-progress__fill--smooth {
@@ -1009,7 +1009,7 @@ div[class*='language-']>.copy[data-copy-state='error'] {
 
 .doc-article blockquote>p {
   margin: 0;
-  line-height: 1.65;
+  line-height: 1.6;
 }
 
 .doc-article table {
@@ -1443,7 +1443,7 @@ html.dark .hm-dialog__title {
 @media (min-width: 992px) {
   main>.container {
     max-width: var(--hm-content-max-width) !important;
-    transform: translateX(100px);
+    transform: translateX(45px);
   }
 }
 
@@ -2478,4 +2478,84 @@ html.dark .hm-search-modal__close {
     font-weight: 400;
     background-color: #f1f4f6;
   }
+}
+
+/* ────────────────────────── */
+/* TOC 右侧大纲栏样式          */
+/* ────────────────────────── */
+.desktop-toc-sidebar {
+  position: fixed;
+  top: var(--hm-desktop-sidebar-top);
+  left: var(--hm-desktop-toc-left);
+  display: var(--hm-desktop-toc-display, none);
+  width: 220px;
+  z-index: 80;
+  pointer-events: auto;
+}
+
+.toc-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 8px;
+  padding-left: 10px;
+}
+
+.toc-nav {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-left: 0;
+  margin-left: 10px;
+}
+
+.toc-nav::before {
+  content: '';
+  position: absolute;
+  top: 9.5px;
+  bottom: 5.5px;
+  left: 0;
+  width: 2px;
+  background-color: #e9ecef;
+}
+
+.toc-link {
+  display: block;
+  /* Gray color, reasonable spacing, close to main text size */
+  color: #6c757d;
+  font-size: 0.95rem;
+  padding: 4px 0;
+  text-decoration: none;
+  transition: none;
+  /* No animation for state switch */
+  line-height: 1.5;
+}
+
+/* H2 indent more than H1 (2~4 spaces), H3>H2, etc. */
+.toc-link.toc-level-1 {
+  padding-left: 14px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.toc-link.toc-level-2 {
+  padding-left: 28px;
+}
+
+.toc-link.toc-level-3 {
+  padding-left: 42px;
+  font-size: 0.9rem;
+}
+
+.toc-link.toc-level-4 {
+  padding-left: 56px;
+  font-size: 0.85rem;
+}
+
+/* 鼠标悬浮 */
+.toc-link:hover,
+.toc-link:active {
+  color: #212529;
+  text-decoration: none;
+  transition: none;
 }

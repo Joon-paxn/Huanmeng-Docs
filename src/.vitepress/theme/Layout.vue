@@ -1,9 +1,44 @@
 <script setup>
-import { useData, useRouter, withBase } from 'vitepress'
+import { useData, useRouter, withBase, onContentUpdated } from 'vitepress'
 import { computed, onBeforeUnmount, onMounted, nextTick, ref, watch } from 'vue'
+
 
 const { site, frontmatter, page } = useData()
 
+const tocHeaders = ref([])
+
+onContentUpdated(() => {
+  if (!docArticleRef.value) {
+    tocHeaders.value = []
+    return
+  }
+  const headings = Array.from(docArticleRef.value.querySelectorAll('h1, h2, h3, h4'))
+  if (headings.length === 0) {
+    tocHeaders.value = []
+    return
+  }
+  tocHeaders.value = headings.map(h => {
+    let title = h.textContent.trim()
+    if (title.endsWith('#')) title = title.substring(0, title.length - 1).trim()
+    return {
+      id: h.id,
+      level: parseInt(h.tagName.charAt(1)),
+      title: title
+    }
+  })
+})
+
+function scrollToToc(id) {
+  const el = document.getElementById(id)
+  if (el) {
+    const top = el.getBoundingClientRect().top + window.scrollY - 80 // offset for site header
+    window.scrollTo({ top, behavior: 'smooth' })
+  }
+}
+
+const shouldShowTOC = computed(() => {
+  return shouldShowDesktopSidebar.value && sidebarSpaceEnough.value && tocHeaders.value.length > 0
+})
 // --- Search Logic ---
 const rawDocs = import.meta.glob('../../docs/**/*.md', { query: '?raw', import: 'default', eager: true })
 const searchActive = ref(false)
@@ -293,9 +328,9 @@ const MOBILE_MEDIA_QUERY = '(max-width: 767.98px)'
 /** 与 Bootstrap `d-lg-block` / style.css 中桌面侧栏媒体查询一致 */
 const DESKTOP_SIDEBAR_MEDIA_QUERY = '(min-width: 992px)'
 const DESKTOP_SIDEBAR_WIDTH_PX = 240
-const DESKTOP_MAIN_SHIFT_X = 100
-const DESKTOP_SIDEBAR_SHIFT_X = 50
-const DESKTOP_SIDEBAR_SHIFT_Y = 30
+const DESKTOP_MAIN_SHIFT_X = 25
+const DESKTOP_SIDEBAR_SHIFT_X = 20
+const DESKTOP_SIDEBAR_SHIFT_Y = 0
 /** 与 style.css 中 .mobile-nav 的 grid-template-rows 时长一致 */
 const MOBILE_NAV_PANEL_MS = 300
 const MOBILE_NAV_CLOSE_FALLBACK_MS = MOBILE_NAV_PANEL_MS + 100
@@ -507,6 +542,8 @@ function syncDesktopSidebarLayout() {
     document.documentElement.style.removeProperty('--hm-desktop-sidebar-left')
     document.documentElement.style.removeProperty('--hm-desktop-sidebar-top')
     document.documentElement.style.removeProperty('--hm-desktop-sidebar-width')
+    document.documentElement.style.removeProperty('--hm-desktop-toc-left')
+    document.documentElement.style.removeProperty('--hm-desktop-toc-display')
   } else {
     sidebarSpaceEnough.value = true
     // cr.left 包含 style.css 中的 translateX(100px)，先减去正文偏移恢复基准，再加侧栏要求的 120px 偏移
@@ -516,6 +553,15 @@ function syncDesktopSidebarLayout() {
     document.documentElement.style.setProperty('--hm-desktop-sidebar-left', `${left}px`)
     document.documentElement.style.setProperty('--hm-desktop-sidebar-top', `${top}px`)
     document.documentElement.style.setProperty('--hm-desktop-sidebar-width', `${DESKTOP_SIDEBAR_WIDTH_PX}px`)
+    
+    // Calculate right TOC layout
+    const tocLeft = Math.round(cr.right) + 40
+    document.documentElement.style.setProperty('--hm-desktop-toc-left', `${tocLeft}px`)
+    if (tocLeft + 220 > document.documentElement.clientWidth) {
+      document.documentElement.style.setProperty('--hm-desktop-toc-display', `none`)
+    } else {
+      document.documentElement.style.setProperty('--hm-desktop-toc-display', `block`)
+    }
   }
 }
 
@@ -1783,6 +1829,26 @@ watch(infoDialogVisible, async visible => {
             </div>
           </div>
         </div>
+      </nav>
+    </aside>
+
+    <aside
+      v-if="shouldShowTOC"
+      class="desktop-toc-sidebar"
+      aria-label="本页目录"
+    >
+      <div class="toc-header">本页内容:</div>
+      <nav class="toc-nav">
+        <a
+          v-for="h in tocHeaders"
+          :key="h.id"
+          :href="`#${h.id}`"
+          class="toc-link"
+          :class="`toc-level-${h.level}`"
+          @click.prevent="scrollToToc(h.id)"
+        >
+          {{ h.title }}
+        </a>
       </nav>
     </aside>
 
