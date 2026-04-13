@@ -7,6 +7,32 @@ const { site, frontmatter, page } = useData()
 
 const tocHeaders = ref([])
 const activeTocId = ref('')
+const tocIndicatorStyle = ref({ transform: 'translateY(0)', height: '0', opacity: '0' })
+
+watch(activeTocId, async (newId) => {
+  if (!newId) {
+    tocIndicatorStyle.value.opacity = '0'
+    return
+  }
+  await nextTick()
+  try {
+    const idSelector = CSS.escape(newId)
+    const linkEl = document.querySelector(`.toc-nav .toc-link[href="#${idSelector}"]`) || document.querySelector(`.toc-nav .toc-link[href="#${newId}"]`)
+    if (linkEl) {
+      const pillHeight = 16;
+      const topOffset = linkEl.offsetTop + (linkEl.offsetHeight - pillHeight) / 2;
+      tocIndicatorStyle.value = {
+        transform: `translateY(${topOffset}px)`,
+        height: `${pillHeight}px`,
+        opacity: '1'
+      }
+    } else {
+      tocIndicatorStyle.value.opacity = '0'
+    }
+  } catch(e) {
+    tocIndicatorStyle.value.opacity = '0'
+  }
+}, { immediate: true })
 
 function updateActiveToc() {
   const headers = tocHeaders.value
@@ -69,19 +95,54 @@ onContentUpdated(() => {
   })
 })
 
+function easeInOutQuint(t) {
+  return t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2;
+}
+
+function smoothScrollTo(endY, duration, callback) {
+  const startY = window.scrollY;
+  const distanceY = endY - startY;
+  const startTime = performance.now();
+
+  function step(time) {
+    const elapsed = time - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = easeInOutQuint(progress);
+    
+    window.scrollTo(0, startY + distanceY * ease);
+
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      if (callback) callback();
+    }
+  }
+  requestAnimationFrame(step);
+}
+
 function scrollToToc(id) {
   const el = document.getElementById(id)
   if (el) {
     if (tocScrollTimeout) clearTimeout(tocScrollTimeout)
     activeTocId.value = id
     
-    const top = el.getBoundingClientRect().top + window.scrollY - 80 // offset for site header
-    window.scrollTo({ top, behavior: 'smooth' })
+    const top = el.getBoundingClientRect().top + window.scrollY - 120 // offset for site header
+    const distance = Math.abs(top - window.scrollY)
+    const duration = Math.min(Math.max(distance * 0.25, 300), 650)
+    
+    smoothScrollTo(top, duration, () => {
+      el.classList.remove('heading-flash')
+      void el.offsetWidth
+      el.classList.add('heading-flash')
+      setTimeout(() => {
+        el.classList.remove('heading-flash')
+      }, 1200)
+    })
     
     // 锁定 activeTocId，防止平滑滚动过程中由于阈值判断导致的高亮“回跳”
     tocScrollTimeout = setTimeout(() => {
       tocScrollTimeout = null
-    }, 1000)
+    }, duration + 50)
   }
 }
 
@@ -1892,6 +1953,7 @@ watch(infoDialogVisible, async visible => {
     >
       <div class="toc-header">本页内容:</div>
       <nav class="toc-nav">
+        <div class="toc-indicator" :style="tocIndicatorStyle"></div>
         <a
           v-for="h in tocHeaders"
           :key="h.id"
