@@ -5,7 +5,7 @@
  *
  * 预设色名（自动适配日间/夜间模式）：
  *   auto, darkred, red, yellow, orange, green,
- *   darkgreen, pink, purple, cyan, blue
+ *   darkgreen, pink, purple, cyan, blue, gray
  *
  * 也支持自定义 HEX 色值：{#ff9800}文本{}
  *
@@ -16,7 +16,7 @@
 
 const PRESET_COLORS = new Set([
   'auto', 'darkred', 'red', 'yellow', 'orange',
-  'green', 'darkgreen', 'pink', 'purple', 'cyan', 'blue'
+  'green', 'darkgreen', 'pink', 'purple', 'cyan', 'blue', 'gray'
 ])
 
 // 匹配 {colorOrHex} 开头部分

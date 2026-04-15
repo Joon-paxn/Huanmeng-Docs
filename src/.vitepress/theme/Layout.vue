@@ -1366,7 +1366,33 @@ function nextDoubleRaf() {
   })
 }
 
+function imgHasExplicitHeight(img) {
+  const raw = img.getAttribute('height')
+  if (raw == null || String(raw).trim() === '') return false
+  const n = Number(raw)
+  return Number.isFinite(n) && n > 0
+}
+
 function applyMultiImageRowHeights(p, imgs) {
+  imgs.forEach(img => {
+    bindLightboxTrigger(img)
+  })
+
+  /* 仅两张并排时 flush：尊重 HTML height + 小间距。≥3 张仍 flush 会按自然宽度换行成多排 */
+  const allExplicitHeight = imgs.length > 0 && imgs.every(imgHasExplicitHeight)
+  const useFlush = allExplicitHeight && imgs.length === 2
+
+  if (useFlush) {
+    p.classList.add('hm-img-row--flush')
+    imgs.forEach(img => {
+      img.style.removeProperty('height')
+      img.style.removeProperty('object-fit')
+    })
+    return
+  }
+
+  p.classList.remove('hm-img-row--flush')
+
   const IMG_ROW_GAP_PX = 12
   const containerWidth = p.clientWidth
   const availWidth = containerWidth - IMG_ROW_GAP_PX * (imgs.length - 1)
@@ -1379,8 +1405,6 @@ function applyMultiImageRowHeights(p, imgs) {
   const targetHeight = minHeight > 0 && isFinite(minHeight) ? Math.round(minHeight) : null
 
   imgs.forEach(img => {
-    bindLightboxTrigger(img)
-
     if (targetHeight) {
       img.style.height = `${targetHeight}px`
       img.style.objectFit = 'cover'

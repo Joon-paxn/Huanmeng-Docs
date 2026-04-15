@@ -1,4 +1,5 @@
 # 🐱 圈小猫
+
 ::: info
 本游戏基于 [Ganlv 的 phaser-catch-the-cat](https://ganlvtech.github.io/phaser-catch-the-cat/) 改写而成。
 :::
@@ -8,32 +9,30 @@
 小人类此时开始追那只白色的小猫... 一段时间后，你和小猫都跑到了一个特殊的场地里，在这片特殊的场地里，小人类获得了放置墙壁的能力：只有小人类操作了一步，小猫才能移动一步。快动用你的大脑防止小猫逃出这片区域吧！
 
 ## 玩法
-### 视频解说
-<div style="position: relative; width: 50%; padding-bottom: 100%;">
-    <iframe src="https://player.bilibili.com/player.html?bvid=BV1YjUxB7EoJ&as_wide=0" style="width: 100%; height: 100%; position: absolute; border: none;"></iframe>
+### 视频教程
+<div class="hm-center-video">
+    <iframe src="https://player.bilibili.com/player.html?bvid=BV1YjUxB7EoJ&as_wide=0"></iframe>
 </div>
 
-### 文字解说
-![](/img/ctc/title.png)<br>
-::: info
-游戏主界面，不同的设备最终渲染效果可能不同。
-:::
+### 文字教程
+![](/img/ctc/title.png){.hm-center-img width="400"}
+<div class="hm-center ct-gray">(游戏主界面，不同的设备最终渲染效果可能不同)</div>
 
 **点击第一个按钮开始游戏：**
 
-![](/img/ctc/button_desc.png){.hm-center-img width="600"}
+![](/img/ctc/button_desc.png){.hm-center-img width="400"}
 
 这里我们可以看到小人类进入到了一片特殊的场地里面，准备施行圈小猫行动~
 
 其中，图内的：
 
-![](/img/ctc/ground.png){.hm-center-img}
+![](/img/ctc/ground.png){.hm-center-img width="50"}
 
 它代表坐标。小人类在放置墙壁时，在后面输入坐标，即可把墙壁放到对应坐标上。
 
-**黑色圆点**代表**墙壁**，当墙壁能够完全围住小猫时{#606060}（类似围棋的规则）{}，代表小猫无路可走了{#606060}（无论怎么走都走不出墙壁的包围）{}，小人类将赢得游戏：成功帮小布丁拿回了被叼走的鞋子~
+**黑色圆点**代表**墙壁**，当墙壁能够完全围住小猫时{gray}（类似围棋的规则）{}，代表小猫无路可走了{gray}（无论怎么走都走不出墙壁的包围）{}，小人类将赢得游戏：成功帮小布丁拿回了被叼走的鞋子~
 
-{#ffa000}橙色圆点{}代表小猫，是小人类本局游戏里要圈住的对象。{#606060}（不同的难度小猫的颜色不一样）{}
+{orange}橙色圆点{}代表小猫，是小人类本局游戏里要圈住的对象。{gray}（不同的难度小猫的颜色不一样）{}
 
 以上面的图片作为参考。点击 **🧱放置一个墙壁** 按钮可以放置新的墙壁，小人类操作一步后，猫也会跟着移动一步。
 
@@ -43,63 +42,25 @@
 
 小人类可点击 **🧱放置墙壁** 按钮来放置新的墙体，根据场地图片来思考你想要放置墙体的位置（觉得墙壁放哪个位置小猫最不容易逃出去就放哪里），_**在聊天框中输入坐标后点击发送，即可完成放置墙壁操作。**_
 
-<div style="column-count: 2; column-gap: 20px;">
-    <div>
-        <img src="/img/ctc/round0_input.png">
-    </div>
-    <div>
-        <img src="/img/ctc/round0_output.png">
-    </div>
-</div>
+![](/img/ctc/round0_input.png){.hm-right-img height="400"}![](/img/ctc/round0_output.png){.hm-left-img height="400"}
 
-此时小人类已经完成了放置墙体的操作，猫也从原来的坐标 **(5, 5)** 移动到了 **(5, 6)**。根据场地图片的信息，我们需要在 **39** 坐标{#606060}（详见下面）{}上放置墙体，**因为小猫它是最喜欢往边界最近的地方走的**，我们需要针对小猫移动的轨迹来放置墙壁，话不多说，接着看下面的图吧。
+此时小人类已经完成了放置墙体的操作，猫也从原来的坐标 **(5, 5)** 移动到了 **(5, 6)**。根据场地图片的信息，我们需要在 **39** 坐标{gray}（详见下面）{}上放置墙体，**因为小猫它是最喜欢往边界最近的地方走的**，我们需要针对小猫移动的轨迹来放置墙壁，话不多说，接着看下面的图吧。
 
-<div style="column-count: 2; column-gap: 20px;">
-    <div>
-        <img src="/img/ctc/round1_input.png">
-    </div>
-    <div>
-        <img src="/img/ctc/round1_output.png">
-    </div>
-</div><br>
+![](/img/ctc/round1_input.png){.hm-right-img height="400"}![](/img/ctc/round1_output.png){.hm-left-img height="400"}
 
 进一步在坐标 **(3, 9)** 放置墙体后，小猫移动到了坐标 **(4, 7)** 的位置，这个时候光看就知道小猫很可能还会往下面走，我们可以在 **59** 坐标上放置墙壁，让小猫误以为逃离到边界最快的办法就是走这条路，但实际上这是一个陷阱！小人类其实可以在游戏过程里巧妙设置陷阱然后故意让小猫进入，**小猫它是最喜欢往边界最近的地方走的**，当小猫意识到自己进入你的陷阱后会想办法逃出来，但逃出来也是需要时间的，这就给了小人类进一步围住小猫的机会。
 
 这段话可能听起来比较难理解，那么直接看下图吧~
-<div style="column-count: 2; column-gap: 20px;">
-    <div>
-        <img src="/img/ctc/round2_0.png">
-    </div>
-    <div>
-        <img src="/img/ctc/round2_1.png">
-    </div>
-</div><br>
 
-![](/img/ctc/round3.png){.hm-center-img width="600"}
+![](/img/ctc/round2_0.png){.hm-right-img height="400"}![](/img/ctc/round2_1.png){.hm-left-img height="400"}
+
+![](/img/ctc/round3.png){.hm-center-img height="500"}
 
 弄陷阱可以让小猫在原计划逃离边界的路线上多走几步。
-<div style="column-count: 6; column-gap: 2px;">
-    <div>
-        <img src="/img/ctc/round4.png">
-    </div>
-    <div>
-        <img src="/img/ctc/round5.png">
-    </div>
-    <div>
-        <img src="/img/ctc/round6.png">
-    </div>
-    <div>
-        <img src="/img/ctc/round7.png">
-    </div>
-    <div>
-        <img src="/img/ctc/round8.png">
-    </div>
-    <div>
-        <img src="/img/ctc/round9.png">
-    </div>
-</div><br>
 
-![](/img/ctc/round10.png){.hm-center-img width="600"}
+![](/img/ctc/round4.png)![](/img/ctc/round5.png)![](/img/ctc/round6.png)![](/img/ctc/round7.png)![](/img/ctc/round8.png)![](/img/ctc/round9.png)
+
+![](/img/ctc/round10.png){.hm-center-img height="500"}
 
 直到最后成功圈住小猫后，小猫后面无论怎么走都走不出小人类围住的墙壁，更不可能逃到边界，故游戏胜利：小人类成功帮助小布丁拿回了被叼走的小鞋子~
 快去试一局吧，幻梦相信小人类会成功的！
@@ -166,7 +127,7 @@
 
 ## 奖励和惩罚
 |难度|胜利奖励|失败惩罚|掉落道具概率|
-|-|-|-|-|
+|:-:|:-:|:-:|:-:|
 |🟦新手|-65%|-90%|0.6%|
 |🟩简单|-30%|-50%|1.5%|
 |🟨普通|标准|标准|2.5%|
@@ -190,7 +151,7 @@
 掉落权重以运势"普通人"为准编写，实际权重视小人类今日运势幸运等级而浮动。
 除"特殊"品质道具外（固定为永久道具），其余掉落的道具分多种状态：限时、不限时、被锁定。其中限时道具分不同时限：3天/7天/14天/30天。"被锁定"指该道具已被锁定，需要消耗一定的额度解锁以使用。不限时指道具为永久时长。
 |品质|道具名|道具作用|掉落权重|
-|-|--------|-|-|
+|:-:|:--------:|-|:-:|
 |普通|打卡加成券|下一次打卡获得的额度+30%。|50|
 |普通|小瓶体力恢复剂|立即恢复60点体力。|50|
 |普通|肾上腺素|使用后，体力恢复速度+30%，持续12小时。|30|

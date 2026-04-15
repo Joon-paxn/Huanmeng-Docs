@@ -7,23 +7,16 @@
 ## 玩法（超级详细）
 1. 点击按钮来开始游戏。
 
-![](/img/password_cracker/start.png){.hm-center-img width="600"}
+![](/img/password_cracker/start.png){.hm-center-img width="400"}
 
 2. 此时按照剧情显示：你点亮了箱子上的显示屏，要求你在指定的时间内打入正确的密码，否则计时结束箱子会自爆以惩罚尝试破解它的人。小人类将默认有5次机会来猜密码，那么请点击下面的 **🆕点击输入密码** ，猜一个密码吧~
 - **{#ff0000}密码没有重复的数字{}，所以不用猜 1122 1233 这样的密码噢！**
 
-<div style="column-count: 2; column-gap: 20px;">
-    <div>
-        <img src="/img/password_cracker/round0.png">
-    </div>
-    <div>
-        <img src="/img/password_cracker/round0_tip.png">
-    </div>
-</div>
+![](/img/password_cracker/round0.png)![](/img/password_cracker/round0_tip.png)
 
 3. 在小人类输完第一个密码之后，箱子将会返回以下结果：
 
-![](/img/password_cracker/round1.png){.hm-center-img width="600"}
+![](/img/password_cracker/round1.png){.hm-center-img width="400"}
 
 - ✅表示最终密码包含这个数字，且密码位置正确。
 - 🟠表示最终密码是有这个数字的，只是位置不对。
@@ -32,16 +25,16 @@
 像上面的例图，结果是：1🟠丨2❌丨3🟠丨4✅
 可以看出，第四个猜的数字4结果是✅，可以确定密码里的第四位数字就是4。
 然而，第1和第3个猜的数字就有点复杂，它们的结果是 "🟠"：
-    - 那么这两个数字它理应是出现在其他密码位置上的，
-    - 如第一个🟠数字1，它应该在第二个位置或第三个位置上，
-    - 第二个🟠数字3它应该在第一个位置或第二个位置上，
-    - 总之不可能在原来的位置上{#606060}（都告诉你位置不对了）{}
-    - 和第四个位置{#606060}（因为第四位密码确定了是4）{}上。
+- 那么这两个数字它理应是出现在其他密码位置上的，
+- 如第一个🟠数字1，它应该在第二个位置或第三个位置上，
+- 第二个🟠数字3它应该在第一个位置或第二个位置上，
+- 总之不可能在原来的位置上{#606060}（都告诉你位置不对了）{}
+- 和第四个位置{#606060}（因为第四位密码确定了是4）{}上。
 然后是第二个数字，这个是❌，那么密码里肯定不会包含这个数字，接着猜吧！
 
-4. **{#0000ff}记住：优先猜没有猜过的数字！{}我们第一次猜的是1234，那么第二次我们就猜5678。**这里进一步猜测，得到了以下结果：
+4. **{blue}记住：优先猜没有猜过的数字！{}我们第一次猜的是1234，那么第二次我们就猜5678。** 这里进一步猜测，得到了以下结果：
 
-![](/img/password_cracker/round2.png){.hm-center-img width="600"}
+![](/img/password_cracker/round2.png){.hm-center-img width="400"}
 
 - 根据结果可以得知，第三位数字对了，它是7，根据上一个密码猜测，我们确定了密码4位数字的其中两位，也就是` ??74 `。
 - 根据第一次密码猜测得知，数字1和3位置不对，不过后两位密码数字我们已经确认下来了，那我们只需要推理出前两位数字，就可以得到完整的密码！
@@ -51,7 +44,7 @@
 
 5. 我们来输入密码验证：
 
-![](/img/password_cracker/round3.png){.hm-center-img width="600"}
+![](/img/password_cracker/round3.png){.hm-center-img width="400"}
 
 - 根据前面推理出来的密码，我们成功破译并打开了宝物箱子，拿到了里面的奖励~！
 - 基本的玩法就是这样了，相信看到这里的小人类，已经懂得了至少如何去破译（猜）密码了吧？也许可以回去上手玩一下啦awa~
@@ -62,23 +55,23 @@
 ## 新手常犯错误
 **常犯错误1（最多）**：猜测密码时猜重复数字。如1111，1122等（不用这样猜!）。
 
-![](/img/password_cracker/tip_dup.png){.hm-center-img width="600"}
+![](/img/password_cracker/tip_dup.png){.hm-center-img width="400"}
 
 **常犯错误2**：每步思考用时过久。
 **解释**：简单难度下，有240秒时间供你猜密码，小人类应该时刻关注剩余时间，每次猜密码所用时间不宜超过10秒，每步思考时间太久很容易会超时导致箱子自爆失去奖励。
 
-![](/img/password_cracker/tip_duration.png){.hm-center-img width="600"}
+![](/img/password_cracker/tip_duration.png){.hm-center-img width="400"}
 
 **常犯错误3**：重复猜打❌的数字。
 **解释**：打❌的数字就不用再猜了，就是告诉小人类密码里不会有这个数字，此时应该猜没猜过的数字来尽快推理！
 
-![](/img/password_cracker/tip_exclude.png){.hm-center-img width="600"}
+![](/img/password_cracker/tip_exclude.png){.hm-center-img width="400"}
 
 
 ## 奖励与惩罚
 成功破译一个箱子可以获得额度和好感度的奖励，也有几率掉落道具。由于难度的不同，破译尝试次数的不同，最终得到的奖励也会不同。
 |难度|胜利|普通失败|超时失败|掉落道具|
-|-|-|-|-|-|
+|:-:|:-:|:-:|:-:|:-:|
 |🟦新手|-60%|-50%|不变|0.1%|
 |🟩简单|-30%|-30%|不变|0.3%|
 |🟨普通|标准|标准|标准|0.5%|
@@ -92,7 +85,7 @@
 ## 进阶方法
 在私信环境下，小人类可以直接打入数字来猜测密码，无需点击按钮，非常方便！
 
-![](/img/password_cracker/tip_numeric.png){.hm-center-img width="600"}
+![](/img/password_cracker/tip_numeric.png){.hm-center-img width="400"}
 
 
 ## 道具掉落

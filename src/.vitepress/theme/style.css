@@ -63,6 +63,7 @@ svg {
   --ct-purple: #7c3aed;
   --ct-cyan: #18a7ca;
   --ct-blue: #3c75f0;
+  --ct-gray: #64748b;
   --hm-content-max-width: 1000px;
 }
 
@@ -94,6 +95,7 @@ html.dark {
   --ct-purple: #c084fc;
   --ct-cyan: #22d3ee;
   --ct-blue: #60a5fa;
+  --ct-gray: #94a3b8;
 }
 
 /* ─── 文本快捷 class ─── */
@@ -139,6 +141,10 @@ html.dark {
 
 .ct-blue {
   color: var(--ct-blue);
+}
+
+.ct-gray {
+  color: var(--ct-gray);
 }
 
 body {
@@ -1180,23 +1186,36 @@ div[class*='language-']>.copy[data-copy-state='error'] {
   line-height: 1.6;
 }
 
-.doc-article table {
-  display: block;
+.doc-article .hm-table-wrap {
   width: 100%;
   margin-bottom: 1rem;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.doc-article .hm-table-wrap>table {
+  width: 100%;
+  min-width: 100%;
+  margin-bottom: 0;
   border-collapse: collapse;
 }
 
-.doc-article table th,
-.doc-article table td {
+.doc-article .hm-table-wrap>table.hm-table--smart {
+  table-layout: fixed;
+  min-width: var(--hm-table-min-width, 100%);
+}
+
+.doc-article .hm-table-wrap>table th,
+.doc-article .hm-table-wrap>table td {
   border-width: 1px 0;
   border-style: solid;
   border-color: #dee2e6;
   padding: 0.4rem 0.75rem;
+  vertical-align: top;
+  overflow-wrap: anywhere;
 }
 
-.doc-article table thead th {
+.doc-article .hm-table-wrap>table thead th {
   border-top: none;
 }
 
@@ -1207,6 +1226,54 @@ div[class*='language-']>.copy[data-copy-state='error'] {
 .doc-article img.hm-center-img {
   display: block;
   margin: 0 auto;
+}
+
+.doc-article img.hm-left-img,
+.doc-article img.hm-right-img {
+  display: block;
+}
+
+.doc-article img.hm-left-img {
+  margin: 0 auto 0 0;
+}
+
+.doc-article img.hm-right-img {
+  margin: 0 0 0 auto;
+}
+
+/* 多图行里默认子项会 flex 均分宽；带左/右类时改为按内容宽，便于 margin 顶到左/右 */
+.doc-article .hm-img-row img.hm-left-img,
+.doc-article .hm-img-row img.hm-right-img {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.doc-article .hm-img-row img.hm-left-img {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.doc-article .hm-img-row img.hm-right-img {
+  margin-left: auto;
+  margin-right: 0;
+}
+
+/* 正文内嵌视频（B 站等 iframe）：居中、限宽、固定 16:9，避免 absolute+height:100% 撑破版面 */
+.doc-article .hm-center-video {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.doc-article .hm-center-video iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 /* 支持页：头图与署名居中；仅署名行改字色 */
@@ -1232,6 +1299,20 @@ div[class*='language-']>.copy[data-copy-state='error'] {
 .doc-article .hm-img-row img {
   flex: 1 1 0%;
   min-width: 0;
+}
+
+/* 多图行内每张图都带 HTML height 时由 Layout 添加：2px间距、按属性高度与比例出宽，不被 flex 均分拉变形 */
+.doc-article .hm-img-row.hm-img-row--flush {
+  gap: 2px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.doc-article .hm-img-row.hm-img-row--flush img {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 /* 电脑端弹窗样式 */
@@ -1418,6 +1499,10 @@ html.dark .hm-dialog__title {
 @media (max-width: 767.98px) {
   .doc-article .hm-img-row {
     gap: 0.5rem;
+  }
+
+  .doc-article .hm-img-row.hm-img-row--flush {
+    gap: 0;
   }
 
   :root {
