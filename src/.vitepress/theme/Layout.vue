@@ -2450,8 +2450,7 @@ watch(infoDialogVisible, async visible => {
     <footer class="site-footer">
       <div class="site-container site-footer-inner">
         <span><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" class="site-footer-link">浙ICP备2026018380号</a></span>
-        <span>©2024-{{ currentYear }} 幻梦，保留所有权利</span>
-        <span><a href="https://register.ccopyright.com.cn/query.html" target="_blank" rel="noopener noreferrer" class="site-footer-link">软件著作权登记号: 2024SR0589691</a></span>
+        <span>© 2024-{{ currentYear }} 幻梦，保留所有权利</span>
       </div>
     </footer>
 

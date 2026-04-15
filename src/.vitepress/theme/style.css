@@ -67,6 +67,8 @@ svg {
   --ct-gray: #7d7d7d;
   /* 文档正文宽度：随屏幕放大，但保留上限，避免 2K/4K 行长失控 */
   --hm-content-max-width: clamp(960px, 68vw, 1080px);
+  /* Markdown <hr>（***）*/
+  --hm-doc-hr-color: rgba(15, 23, 42, 0.14);
 }
 
 html.dark {
@@ -98,6 +100,7 @@ html.dark {
   --ct-cyan: #22d3ee;
   --ct-blue: #60a5fa;
   --ct-gray: #94a3b8;
+  --hm-doc-hr-color: rgba(235, 239, 245, 0.16);
 }
 
 /* ─── 文本快捷 class ─── */
@@ -1426,6 +1429,13 @@ div[class*='language-']>.copy[data-copy-state='error'] {
   user-select: none;
 }
 
+/* Markdown 水平线（*** / --- / ___）*/
+.doc-article hr:not(.search-results-divider) {
+  margin: 16px 0;
+  border: none;
+  border-top: 1px solid var(--hm-doc-hr-color);
+}
+
 /* 引用 */
 .doc-article blockquote {
   display: flex;
@@ -2201,6 +2211,8 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
   .site-footer-inner {
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
   }
 }
 
@@ -2564,7 +2576,7 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
 }
 
 
-/* ── Footer 手机端三行居中 ── */
+/* ── Footer 手机端两行居中 ── */
 @media (max-width: 767.98px) {
   .site-shell>footer {
     border-top-left-radius: 12px;
