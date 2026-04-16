@@ -1085,7 +1085,7 @@ function armMobileNavCloseHold() {
 
 function onMobileNavTransitionEnd(e) {
   if (menuOpen.value) return
-  if (e.propertyName !== 'grid-template-rows') return
+  if (e.propertyName !== 'transform' && e.propertyName !== 'opacity') return
   mobileNavClosingHold.value = false
   clearMobileNavCloseFallback()
   syncBodyScrollLock()
