@@ -463,21 +463,6 @@ function focusDesktopSearch() {
   })
 }
 
-function handleMobileSearchClick() {
-  if (isMobileViewport()) {
-    if (!menuOpen.value) {
-      menuOpen.value = true
-      nextTick(() => {
-        mobileSearchInputRef.value?.focus()
-      })
-    } else {
-      mobileSearchInputRef.value?.focus()
-    }
-  } else {
-    focusDesktopSearch()
-  }
-}
-
 function closeGlobalSearch() {
   globalSearchModalActive.value = false
   searchQuery.value = ''
@@ -511,7 +496,13 @@ const desktopSidebarLinks = [
     hasAnyActive: relativePath => relativePath === 'docs/entertainment/index.md' || relativePath.startsWith('docs/entertainment/'),
     children: [
       { href: '/docs/entertainment/signin', label: '打卡', isActive: relativePath => relativePath === 'docs/entertainment/signin.md' },
-      { href: '/docs/entertainment/fortune', label: '运势', isActive: relativePath => relativePath === 'docs/entertainment/fortune.md' },
+      { href: '/docs/entertainment/fortune', label: '今日运势', isActive: relativePath => relativePath === 'docs/entertainment/fortune.md' },
+      {
+        href: '/docs/entertainment/daily_wife/',
+        label: '今日老婆',
+        isActive: relativePath => relativePath === 'docs/entertainment/daily_wife/index.md',
+        hasAnyActive: relativePath => relativePath.startsWith('docs/entertainment/daily_wife/')
+      },
       { href: '/docs/entertainment/sence', label: '好感度', isActive: relativePath => relativePath === 'docs/entertainment/sence.md' },
       {
         href: '/docs/entertainment/ctc/',
@@ -527,11 +518,11 @@ const desktopSidebarLinks = [
         ]
       },
       { href: '/docs/entertainment/random_image', label: '随机图', isActive: relativePath => relativePath === 'docs/entertainment/random_image.md' },
-      { href: '/docs/entertainment/paint_bomb', label: '油漆炸弹', isActive: relativePath => relativePath === 'docs/entertainment/paint_bomb.md' },
-      { href: '/docs/entertainment/twenty_four_points', label: '二十四点', isActive: relativePath => relativePath === 'docs/entertainment/twenty_four_points.md' },
-      { href: '/docs/entertainment/word_chain', label: '词汇接龙', isActive: relativePath => relativePath === 'docs/entertainment/word_chain.md' },
       { href: '/docs/entertainment/flop', label: '翻牌', isActive: relativePath => relativePath === 'docs/entertainment/flop.md' },
-      { href: '/docs/entertainment/password_cracker', label: '破译', isActive: relativePath => relativePath === 'docs/entertainment/password_cracker.md' }
+      { href: '/docs/entertainment/password_cracker', label: '破译', isActive: relativePath => relativePath === 'docs/entertainment/password_cracker.md' },
+      { href: '/docs/entertainment/twenty_four_points', label: '二十四点', isActive: relativePath => relativePath === 'docs/entertainment/twenty_four_points.md' },
+      { href: '/docs/entertainment/paint_bomb', label: '油漆炸弹', isActive: relativePath => relativePath === 'docs/entertainment/paint_bomb.md' },
+      { href: '/docs/entertainment/word_chain', label: '词汇接龙', isActive: relativePath => relativePath === 'docs/entertainment/word_chain.md' }
     ]
   },
   { 
@@ -899,6 +890,13 @@ function runDesktopSearchPlaceholderCycle() {
 /** 桌面侧栏定位：顶部对齐导航栏底边，左侧贴齐屏幕。 */
 function syncDesktopSidebarLayout() {
   if (typeof document === 'undefined') return
+  const headerEl = siteHeaderRef.value
+  if (headerEl) {
+    const headerRect = headerEl.getBoundingClientRect()
+    const mobileHeaderHeight = Math.max(0, Math.round(headerRect.height))
+    document.documentElement.style.setProperty('--hm-mobile-header-height', `${mobileHeaderHeight}px`)
+  }
+
   if (!window.matchMedia(DESKTOP_SIDEBAR_MEDIA_QUERY).matches) {
     sidebarSpaceEnough.value = true
     document.documentElement.style.removeProperty('--hm-desktop-sidebar-left')
@@ -908,7 +906,6 @@ function syncDesktopSidebarLayout() {
   }
 
   const containerEl = mainContainerRef.value
-  const headerEl = siteHeaderRef.value
   if (!containerEl || !headerEl) return
 
   const cr = containerEl.getBoundingClientRect()
@@ -931,6 +928,7 @@ function syncDesktopSidebarLayout() {
 
 function openSidebar() {
   if (isMobileViewport()) {
+    closeMobileMenu()
     mobileSidebarOpen.value = true
     return
   }
@@ -1141,7 +1139,21 @@ function closeMobileMenu() {
   menuOpen.value = false
 }
 
+function toggleMobileSidebar() {
+  if (!isMobileViewport() || !shouldShowDesktopSidebar.value) return
+  if (mobileSidebarOpen.value) {
+    closeSidebar()
+    return
+  }
+
+  openSidebar()
+}
+
 function toggleMobileMenu() {
+  if (mobileSidebarOpen.value) {
+    closeSidebar()
+  }
+
   menuOpen.value = !menuOpen.value
 }
 
@@ -2149,6 +2161,7 @@ onBeforeUnmount(() => {
     document.documentElement.style.removeProperty('--hm-desktop-sidebar-left')
     document.documentElement.style.removeProperty('--hm-desktop-sidebar-top')
     document.documentElement.style.removeProperty('--hm-desktop-sidebar-width')
+    document.documentElement.style.removeProperty('--hm-mobile-header-height')
   }
   stopDesktopSearchPlaceholderCycle()
   clearMobileNavCloseFallback()
@@ -2516,22 +2529,49 @@ watch(infoDialogVisible, async visible => {
             </div>
           </div>
 
-          <!-- 移动端汉堡按钮，仅 md 以下可见 -->
-          <button
-            class="mobile-menu-btn"
-            :class="{ open: menuOpen }"
-            type="button"
-            aria-label="站点导航"
-            aria-controls="mobile-site-nav"
-            :aria-expanded="menuOpen ? 'true' : 'false'"
-            @click="toggleMobileMenu"
-          >
-            <span class="mobile-menu-icon">
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
-          </button>
+          <div class="mobile-header-primary">
+            <!-- 移动端汉堡按钮，仅 md 以下可见 -->
+            <button
+              v-if="shouldShowDesktopSidebar"
+              class="mobile-menu-btn"
+              :class="{ open: mobileSidebarOpen }"
+              type="button"
+              aria-label="打开侧边栏"
+              :aria-expanded="String(mobileSidebarOpen)"
+              @click="toggleMobileSidebar"
+            >
+              <span class="mobile-menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </button>
+
+            <div class="site-branding mobile-site-branding">
+              <a class="site-branding-link" :href="withBase('/')" aria-label="幻梦Bot 首页">
+                <img class="site-branding-icon" :src="withBase('/img/hm_icon.png')" alt="" aria-hidden="true">
+                <span class="site-branding-text">幻梦Bot</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="mobile-header-search">
+            <button
+              class="mobile-nav-menu-btn"
+              :class="{ open: menuOpen }"
+              type="button"
+              aria-label="打开站点导航和搜索"
+              aria-controls="mobile-site-nav"
+              :aria-expanded="String(menuOpen)"
+              @click="toggleMobileMenu"
+            >
+              <span class="mobile-nav-menu-icon" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </button>
+          </div>
         </div>
 
         <!-- 移动端下拉导航 -->
@@ -2542,14 +2582,14 @@ watch(infoDialogVisible, async visible => {
           @transitionend.self="onMobileNavTransitionEnd"
         >
           <div class="mobile-nav-inner">
-            <!-- 移动端搜索框 -->
-            <div class="mobile-nav-search">
+            <div class="mobile-nav-search" role="search">
               <div class="mobile-search-box">
-                <input 
+                <input
                   ref="mobileSearchInputRef"
-                  v-model="searchQuery" 
-                  type="text" 
-                  placeholder="搜索文档..." 
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="搜索文档..."
+                  aria-label="搜索内容"
                 />
                 <svg class="mobile-search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
               </div>
@@ -2589,16 +2629,6 @@ watch(infoDialogVisible, async visible => {
     <Transition name="mobile-nav-backdrop-fade">
       <div v-if="menuOpen && !searchQuery.trim()" class="mobile-nav-backdrop" @click="closeMobileMenu"></div>
     </Transition>
-
-    <!-- 移动端呼出侧边栏按钮 -->
-    <button
-      v-if="shouldShowDesktopSidebar && isMobileView && !mobileSidebarOpen"
-      class="mobile-sidebar-trigger"
-      @click="openSidebar"
-      aria-label="打开侧边栏"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
-    </button>
 
     <button
       v-if="shouldShowDesktopSidebar && !isMobileView && desktopSidebarCollapsed"

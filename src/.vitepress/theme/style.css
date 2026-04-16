@@ -83,6 +83,7 @@ svg {
   /* 桌面文档侧栏距视口底部的留白，与 top 共同限定固定侧栏高度 */
   --hm-desktop-sidebar-bottom: 56px;
   --hm-desktop-sidebar-width: 256px;
+  --hm-mobile-header-height: 58px;
   --hm-dialog-overlay: rgba(0, 0, 0, 0.3);
   --hm-dialog-surface: #ffffff;
   --hm-dialog-border: rgba(255, 255, 255, 0.7);
@@ -343,6 +344,15 @@ a:hover {
   min-width: 0;
 }
 
+.mobile-header-primary,
+.mobile-header-search {
+  display: none;
+}
+
+.mobile-nav-menu-btn {
+  display: none;
+}
+
 .site-header-search__actions {
   display: flex;
   align-items: center;
@@ -572,12 +582,37 @@ a:hover {
   }
 
   .site-header-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
     min-height: 44px;
+    gap: 12px;
   }
 
+  .site-branding,
   .site-header-tools,
   .site-header-search {
     display: none;
+  }
+
+  .mobile-header-primary {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 14px;
+  }
+
+  .mobile-site-branding {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .mobile-header-search {
+    display: flex;
+    align-items: center;
+    justify-self: end;
+    min-width: 0;
   }
 
   /* 移动端文档切换进度条：整块 header（顶栏+下拉导航）下沿，横向通栏 */
@@ -614,10 +649,6 @@ a:hover {
     transition: width 0.34s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .site-branding {
-    flex: 1 1 auto;
-  }
-
   .site-branding-link {
     gap: 10px;
   }
@@ -652,6 +683,12 @@ a:hover {
     padding-left: 1rem;
     padding-right: 1rem;
     padding-bottom: 8px;
+  }
+
+  .mobile-nav-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .site-header.mobile-header-hidden {
@@ -741,6 +778,7 @@ a:hover {
 }
 
 @media (min-width: 768px) {
+
   /*
    * 顶栏需相对视口全宽：否则 .site-container 的 max-width 会把 Logo/搜索挤在页面中部，
    * 无法做到「距屏幕左右各 50px」。中间栏仍用 grid 居中。
@@ -781,6 +819,8 @@ a:hover {
     max-width: 100%;
   }
 
+  .mobile-header-primary,
+  .mobile-header-search,
   .mobile-menu-btn,
   .mobile-nav,
   .mobile-nav-backdrop {
@@ -929,7 +969,7 @@ a:hover {
     flex-direction: column;
   }
 
-  .desktop-doc-sidebar__body > .desktop-doc-sidebar__group + .desktop-doc-sidebar__group {
+  .desktop-doc-sidebar__body>.desktop-doc-sidebar__group+.desktop-doc-sidebar__group {
     margin-top: 4px;
   }
 
@@ -1050,36 +1090,11 @@ a:hover {
 }
 
 @media (max-width: 991.98px) {
-  .mobile-sidebar-trigger {
-    position: fixed;
-    left: 0;
-    top: 30%;
-    transform: translateY(-50%);
-    z-index: 900;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-left: none;
-    border-radius: 0 12px 12px 0;
-    padding: 5px 10px;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.08);
-    color: #6c757d;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s ease, color 0.2s;
-  }
-
-  .mobile-sidebar-trigger:hover {
-    background: #f1f4f6;
-    color: #495057;
-  }
-
   .desktop-doc-sidebar {
     position: fixed;
-    top: 0;
+    top: var(--hm-mobile-header-height);
     left: 0;
-    height: 100vh;
+    height: calc(100vh - var(--hm-mobile-header-height));
     width: 280px;
     z-index: 1050;
     pointer-events: none;
@@ -1178,7 +1193,7 @@ a:hover {
     flex-direction: column;
   }
 
-  .desktop-doc-sidebar__body > .desktop-doc-sidebar__group + .desktop-doc-sidebar__group {
+  .desktop-doc-sidebar__body>.desktop-doc-sidebar__group+.desktop-doc-sidebar__group {
     margin-top: 4px;
   }
 
@@ -1680,6 +1695,23 @@ div[class*='language-']>.copy[data-copy-state='error'] {
   width: auto;
   max-width: 100%;
   object-fit: contain;
+}
+
+/* 针对手机端：防止带宽高的多图换行及对齐导致的错位问题 */
+@media (max-width: 767.98px) {
+  .doc-article .hm-img-row.hm-img-row--flush {
+    flex-wrap: nowrap;
+    gap: 0.75rem; /* 在手机上恢复正常间距 */
+  }
+  .doc-article .hm-img-row.hm-img-row--flush img {
+    height: auto !important; /* 忽略固定高度，允许根据宽度等比缩放 */
+  }
+  /* 在小屏幕强制均分空间，取消左右两端对齐引起的强制宽度计算 */
+  .doc-article .hm-img-row img.hm-left-img,
+  .doc-article .hm-img-row img.hm-right-img {
+    flex: 1 1 0% !important;
+    margin: 0 !important;
+  }
 }
 
 /* 电脑端弹窗样式 */
@@ -2462,7 +2494,7 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
     text-align: center;
   }
 
-  .home-feature-item + .home-feature-item {
+  .home-feature-item+.home-feature-item {
     border-top: 1px solid #dee2e6;
   }
 
@@ -2590,17 +2622,19 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
 /* ── 移动端汉堡菜单 ── */
 
 .mobile-menu-btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: auto;
+  height: auto;
   padding: 0;
-  background: none;
-  border: 1.5px solid #ced4da;
-  border-radius: 12px;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: none;
   flex-shrink: 0;
   align-self: center;
   -webkit-tap-highlight-color: transparent;
@@ -2609,24 +2643,63 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
   outline: none;
 }
 
+.mobile-nav-menu-btn {
+  position: relative;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+  cursor: pointer;
+  transition: none;
+  flex: 0 0 auto;
+  align-self: center;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+.mobile-menu-btn::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  right: -3px;
+  bottom: -10px;
+  left: -10px;
+}
+
+.mobile-nav-menu-btn::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+}
+
 .mobile-menu-btn:focus,
 .mobile-menu-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.18);
+  box-shadow: none;
+}
+
+.mobile-nav-menu-btn:focus,
+.mobile-nav-menu-btn:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 .mobile-menu-btn:active {
-  background-color: rgba(0, 123, 255, 0.06);
-  border-color: #ced4da;
-}
-
-.mobile-menu-btn.open:active {
-  border-color: #007bff;
+  background-color: transparent;
 }
 
 .mobile-menu-btn.open {
-  border-color: #007bff;
-  background-color: rgba(0, 123, 255, 0.08);
+  background-color: transparent;
+}
+
+.mobile-nav-menu-btn:active,
+.mobile-nav-menu-btn.open {
+  background-color: transparent;
 }
 
 /* 三条横线图标 */
@@ -2639,13 +2712,43 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
   height: 14px;
 }
 
+.mobile-nav-menu-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  width: 18px;
+  height: 14px;
+}
+
 .mobile-menu-icon span {
   display: block;
   height: 2px;
   background-color: #adb5bd;
   border-radius: 2px;
-  transition: background-color 0.2s ease;
+  transition: none;
   transform-origin: center;
+}
+
+.mobile-nav-menu-icon span {
+  display: block;
+  height: 2px;
+  background-color: #adb5bd;
+  border-radius: 2px;
+  transition: none;
+}
+
+.mobile-nav-menu-icon span:nth-child(1) {
+  width: 18px;
+}
+
+.mobile-nav-menu-icon span:nth-child(2) {
+  width: 13px;
+}
+
+.mobile-nav-menu-icon span:nth-child(3) {
+  width: 9px;
 }
 
 /* 展开时保持三条线形态，仅切换为蓝色高亮 */
@@ -2658,6 +2761,10 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
 }
 
 .mobile-menu-btn.open .mobile-menu-icon span:nth-child(3) {
+  background-color: #007bff;
+}
+
+.mobile-nav-menu-btn.open .mobile-nav-menu-icon span {
   background-color: #007bff;
 }
 
@@ -2755,7 +2862,8 @@ button:not(.plugin-tabs--tab):not([class*='hm-dialog__']):not([class*='sidebar']
 }
 
 .sidebar-search-header .desktop-doc-sidebar__heading {
-  padding: 0 0 0 24px !important; /* "页面切换" 间距补充 */
+  padding: 0 0 0 24px !important;
+  /* "页面切换" 间距补充 */
   line-height: 1;
 }
 
@@ -2957,7 +3065,7 @@ html.dark .search-highlight {
 .mobile-search-box input {
   width: 100%;
   height: 42px;
-  padding: 0 12px 0 40px;
+  padding: 0 40px 0 14px;
   border-radius: 8px;
   border: 1.5px solid rgba(0, 0, 0, 0.1);
   background: rgba(0, 0, 0, 0.02);
@@ -2974,20 +3082,11 @@ html.dark .search-highlight {
 
 .mobile-search-icon {
   position: absolute;
-  left: 14px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: #adb5bd;
   pointer-events: none;
-}
-
-html.dark .mobile-header-search-btn {
-  border-color: rgba(255, 255, 255, 0.2);
-  color: #adb5bd;
-}
-
-html.dark .mobile-nav-search {
-  border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 html.dark .mobile-search-box input {
@@ -2999,6 +3098,10 @@ html.dark .mobile-search-box input {
 html.dark .mobile-search-box input:focus {
   background: rgba(255, 255, 255, 0.1);
   border-color: #007bff;
+}
+
+html.dark .mobile-nav-search {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 /* ── 全局搜索弹窗 (Desktop Home Fallback) ── */
@@ -3117,6 +3220,12 @@ html.dark .hm-search-modal__close {
   background: rgba(15, 23, 42, 0.1);
 }
 
+@media (max-width: 991.98px) {
+  .sidebar-backdrop {
+    top: var(--hm-mobile-header-height);
+  }
+}
+
 .sidebar-backdrop-fade-enter-active,
 .sidebar-backdrop-fade-leave-active {
   transition: opacity 0.25s ease;
@@ -3129,31 +3238,6 @@ html.dark .hm-search-modal__close {
 
 /* Sidebar compact mode on desktop */
 @media (min-width: 992px) {
-  .sidebar-compact-mode .mobile-sidebar-trigger {
-    position: fixed;
-    left: 0;
-    top: 30%;
-    transform: translateY(-50%);
-    z-index: 900;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-left: none;
-    border-radius: 0 12px 12px 0;
-    padding: 5px 10px;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.08);
-    color: #6c757d;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s ease, color 0.2s;
-  }
-
-  .sidebar-compact-mode .mobile-sidebar-trigger:hover {
-    background: #f1f4f6;
-    color: #495057;
-  }
-
   .sidebar-compact-mode .desktop-doc-sidebar {
     position: fixed;
     top: 0;
@@ -3234,7 +3318,7 @@ html.dark .hm-search-modal__close {
     flex-direction: column;
   }
 
-  .sidebar-compact-mode .desktop-doc-sidebar__body > .desktop-doc-sidebar__group + .desktop-doc-sidebar__group {
+  .sidebar-compact-mode .desktop-doc-sidebar__body>.desktop-doc-sidebar__group+.desktop-doc-sidebar__group {
     margin-top: 4px;
   }
 
@@ -3480,7 +3564,6 @@ body,
 .sidebar-menu-trigger,
 .sidebar-menu-icon,
 .sidebar-close-trigger,
-.mobile-sidebar-trigger,
 .desktop-sidebar-trigger,
 .site-footer-inner,
 .home-subtitle,
@@ -3491,7 +3574,7 @@ body,
 .search-results-article .search-result-snippet,
 .toc-header,
 .toc-link,
-.doc-article.docs-support-article h1 + p + p {
+.doc-article.docs-support-article h1+p+p {
   color: var(--hm-text-3);
 }
 
@@ -3506,8 +3589,7 @@ body,
 .search-result-item,
 .desktop-doc-sidebar__panel,
 .sidebar-compact-mode .desktop-doc-sidebar__panel,
-.desktop-sidebar-trigger,
-.mobile-sidebar-trigger {
+.desktop-sidebar-trigger {
   background: var(--hm-surface-1);
   border-color: var(--hm-border);
 }
@@ -3535,7 +3617,6 @@ body,
 
 .site-header-search__icon:hover,
 .sidebar-search-trigger:hover,
-.mobile-sidebar-trigger:hover,
 .desktop-sidebar-trigger:hover,
 .sidebar-close-trigger:hover,
 .toc-link:hover,
@@ -3548,7 +3629,6 @@ body,
 .desktop-doc-sidebar__child-link:hover,
 .sidebar-compact-mode .desktop-doc-sidebar__link:hover,
 .sidebar-compact-mode .desktop-doc-sidebar__child-link:hover,
-.mobile-sidebar-trigger:hover,
 .desktop-sidebar-trigger:hover,
 .sidebar-close-trigger:hover,
 .search-result-item:hover {
@@ -3590,13 +3670,12 @@ body,
   box-shadow: var(--hm-shadow-md);
 }
 
-.mobile-nav-search,
 .site-footer,
 .search-results-divider,
 .desktop-doc-sidebar__divider,
 .sidebar-compact-mode .desktop-doc-sidebar__divider,
 .home-divider,
-.home-feature-item + .home-feature-item {
+.home-feature-item+.home-feature-item {
   border-color: var(--hm-border);
 }
 
@@ -3607,21 +3686,6 @@ body,
 .site-footer {
   background: var(--hm-surface-2);
   border-top-color: var(--hm-border);
-}
-
-.mobile-menu-btn {
-  background: var(--hm-surface-1);
-  border-color: var(--hm-border-strong);
-}
-
-.mobile-menu-btn:active {
-  background-color: var(--hm-accent-soft);
-  border-color: var(--hm-border-strong);
-}
-
-.mobile-menu-btn.open {
-  background-color: var(--hm-accent-soft);
-  border-color: var(--hm-link-color);
 }
 
 .mobile-menu-icon span {
@@ -3656,7 +3720,7 @@ body,
   background: var(--hm-code-inline-bg);
 }
 
-html.dark .doc-article div[class*='language-'] > pre {
+html.dark .doc-article div[class*='language-']>pre {
   color: var(--shiki-dark) !important;
 }
 
@@ -3666,12 +3730,12 @@ html.dark .doc-article div[class*='language-'] > pre {
   border-left-color: var(--hm-quote-border);
 }
 
-.doc-article .hm-table-wrap > table th,
-.doc-article .hm-table-wrap > table td {
+.doc-article .hm-table-wrap>table th,
+.doc-article .hm-table-wrap>table td {
   border-color: var(--hm-table-border);
 }
 
-.doc-article .hm-table-wrap > table thead th {
+.doc-article .hm-table-wrap>table thead th {
   background: var(--hm-table-head-bg);
 }
 
