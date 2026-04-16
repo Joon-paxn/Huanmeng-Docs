@@ -731,6 +731,16 @@ function tickNavRouteProgress() {
 }
 
 function beginRouteNavProgress(href) {
+  if (isMobileViewport()) {
+    navRoutePendingKey = null
+    clearNavRouteProgressTimers()
+    navRouteProgress.value = 0
+    navRouteProgressVisible.value = false
+    navRouteProgressFading.value = false
+    navRouteProgressSmooth.value = false
+    return
+  }
+
   clearNavRouteProgressTimers()
   const now = performance.now()
   if (lastRouteSwitchStartedAt && now - lastRouteSwitchStartedAt <= DOC_PAGE_FAST_SWITCH_WINDOW_MS) {
@@ -1395,6 +1405,12 @@ watch(
   mobile => {
     syncTocScrollListener()
     if (mobile) {
+      navRoutePendingKey = null
+      clearNavRouteProgressTimers()
+      navRouteProgress.value = 0
+      navRouteProgressVisible.value = false
+      navRouteProgressFading.value = false
+      navRouteProgressSmooth.value = false
       stopDesktopSearchPlaceholderCycle()
       return
     }
@@ -2248,7 +2264,7 @@ watch(infoDialogVisible, async visible => {
 
       <!-- 顶部导航加载进度条（移动端/桌面端统一） -->
       <div
-        v-show="navRouteProgressVisible || navRouteProgressFading"
+        v-show="!isMobileView && (navRouteProgressVisible || navRouteProgressFading)"
         class="site-nav-route-progress"
         :class="{ 'site-nav-route-progress--fading': navRouteProgressFading }"
         aria-hidden="true"
