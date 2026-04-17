@@ -494,7 +494,7 @@ const navLinks = [
     children: [
       {
         href: 'https://qm.qq.com/q/6lmTZCS0SY',
-        label: '群聊',
+        label: 'QQ群',
         isExternal: true,
         confirmTitle: '二次确认',
         confirmMessage: '即将跳转到QQ幻梦官方群，是否继续？',
@@ -502,10 +502,18 @@ const navLinks = [
       },
       {
         href: 'https://pd.qq.com/s/13nxjzopi',
-        label: '频道',
+        label: 'QQ频道',
         isExternal: true,
         confirmTitle: '二次确认',
         confirmMessage: '即将跳转到QQ幻梦官方频道，是否继续？',
+        confirmLabel: '确认'
+      },
+      {
+        href: 'https://space.bilibili.com/454289878',
+        label: 'BiliBili',
+        isExternal: true,
+        confirmTitle: '二次确认',
+        confirmMessage: '即将跳转到QQ布丁开发者B站空间，是否继续？',
         confirmLabel: '确认'
       }
     ]
