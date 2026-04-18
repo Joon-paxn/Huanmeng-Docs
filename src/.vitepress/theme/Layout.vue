@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { useData, useRouter, withBase, onContentUpdated } from 'vitepress'
 import { computed, onBeforeUnmount, onMounted, nextTick, ref, watch } from 'vue'
 import SidebarNavItem from './components/SidebarNavItem.vue'
@@ -776,15 +776,9 @@ let swipeTouchStartY = 0
 let swipeTracking = false
 /** 是否已确认为侧边栏方向的水平滑动（锁轴后不再重判） */
 let swipeAxisLocked = false
-/** 是否确认为垂直方向（排除侧边栏手势） */
+/** 手势已经确认为垂直方向（排除侧边栏手势） */
 let swipeVerticalLocked = false
-/** 顶部过滑追踪：手指落下时页面是否处于顶部 */
-let overScrollAtTop = false
-/** 触发顶部过滑菜单所需的最小上滑位移（px） */
-const SWIPE_OVERSCROLL_THRESHOLD = 72
-/** 侧边栏右滑：起始触点必须在屏幕左侧的感应边距（px） */
-const SWIPE_LEFT_EDGE_WIDTH = 28
-/** 轴锁定阈值：水平/垂直位移差超过此值才锁轴（px） */
+/** 侧边栏手势确认所需的最小水平位移（px） */
 const SWIPE_AXIS_LOCK_THRESHOLD = 8
 /** 侧边栏手势确认所需的最小水平位移（px） */
 const SWIPE_SIDEBAR_THRESHOLD = 48
@@ -2328,12 +2322,10 @@ function handleSwipeTouchStart(e) {
   swipeTracking = true
   swipeAxisLocked = false
   swipeVerticalLocked = false
-  overScrollAtTop = (window.scrollY <= 0)
 }
 
 function handleSwipeTouchMove(e) {
   if (!swipeTracking || e.touches.length !== 1) return
-  if (!overScrollAtTop && window.scrollY > 0) return // 快速跳过非顶部垂直滚动
 
   const touch = e.touches[0]
   const dx = Math.abs(touch.clientX - swipeTouchStartX)
@@ -2355,40 +2347,18 @@ function handleSwipeTouchEnd(e) {
   if (!changedTouch) return
 
   const dx = changedTouch.clientX - swipeTouchStartX
-  const dy = changedTouch.clientY - swipeTouchStartY
 
-  // 手势①：在顶部向上拉（先下拉再上推，或直接上拉）超过阈值 → 触发右上角菜单
-  if (overScrollAtTop && swipeVerticalLocked && dy < -SWIPE_OVERSCROLL_THRESHOLD && window.scrollY <= 8) {
-    overScrollAtTop = false
-    toggleMobileMenu()
-    return
-  }
+  if (swipeVerticalLocked) return
 
-  if (swipeVerticalLocked) { overScrollAtTop = false; return }
-
-  // 手势②：从左边缘右滑呼出侧边栏（仅在侧边栏页面且已关闭时）
-  if (
-    dx >= SWIPE_SIDEBAR_THRESHOLD &&
-    swipeTouchStartX <= SWIPE_LEFT_EDGE_WIDTH &&
-    shouldShowDesktopSidebar.value &&
-    !mobileSidebarOpen.value
-  ) {
-    openSidebar()
-    return
-  }
-
-  // 手势③：任意位置左滑关闭已打开的侧边栏
+  // 手势：任意位置左滑关闭已打开的侧边栏
   if (dx <= -SWIPE_SIDEBAR_THRESHOLD && mobileSidebarOpen.value) {
     closeSidebar()
     return
   }
-
-  overScrollAtTop = false
 }
 
 function handleSwipeTouchCancel() {
   swipeTracking = false
-  overScrollAtTop = false
 }
 onMounted(() => {
   syncColorModeFromDocument()
